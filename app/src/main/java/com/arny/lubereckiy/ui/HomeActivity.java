@@ -4,16 +4,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import com.arny.lubereckiy.R;
 import com.arny.lubereckiy.service.OperationProvider;
 import com.arny.lubereckiy.service.Operations;
-import com.arny.lubereckiy.utils.ToastMaker;
+import com.arny.lubereckiy.utils.Config;
 import com.arny.lubereckiy.utils.Utility;
 
 public class HomeActivity extends AppCompatActivity {
@@ -23,6 +22,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
         findViewById(R.id.btnGet).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -41,6 +41,20 @@ public class HomeActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter(Operations.ACTION);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         LocalBroadcastManager.getInstance(this).registerReceiver(operationReciever, filter);
+        String lastupdate = Config.getString("lastUpdate", this);
+        initUpdate(lastupdate);
+    }
+
+    public void initUpdate(String lastupdate) {
+        if (Utility.empty(lastupdate)) {
+            if (Utility.isServiceRunning(Operations.class, this)) {
+                if (!operationFinished) {
+                    setTitle("Обновление генплана");
+                }
+            }else{
+               boolean mustUpdate =
+            }
+        }
     }
 
     @Override
@@ -62,16 +76,9 @@ public class HomeActivity extends AppCompatActivity {
                 success = provider.isSuccess();
                 operation = provider.getId();
                 operationResult = provider.getResult();
-                Log.i(HomeActivity.class.getSimpleName(), "onReceive: extras operation= " + operation);
-                Log.i(HomeActivity.class.getSimpleName(), "onReceive: extras operationFinished= " + operationFinished);
-                Log.i(HomeActivity.class.getSimpleName(), "onReceive: extras success= " + success);
-//                Log.i(HomeActivity.class.getSimpleName(), "onReceive: extras getOperationData= " + provider.getOperationData());
-                Log.i(HomeActivity.class.getSimpleName(), "onReceive: extras operationResult= " + operationResult);
-                Log.i(HomeActivity.class.getSimpleName(), "onReceive: time = " + Utility.getDateTime());
             }
-            if (operationFinished) {
-                ToastMaker.toast(context,"Результат операции " + operation + ":"+ operationResult, success);
-                if (operation==Operations.OPERATION_PARSE_GEN_PLAN){
+            if (operation == Operations.OPERATION_PARSE_FLATS) {
+                if (operationFinished) {
                     setTitle("Обновление генплана завершено");
                 }
             }

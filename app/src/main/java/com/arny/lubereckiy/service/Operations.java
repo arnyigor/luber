@@ -20,8 +20,8 @@ import java.util.HashMap;
 public class Operations extends AbstractIntentService {
     public static final int OPERATION_GET_GEN_PLAN = 101;
     public static final int OPERATION_PARSE_GEN_PLAN = 102;
-    private static final int OPERATION_PARSE_KORPUSES = 103;
-    private static final int OPERATION_PARSE_FLATS = 104;
+    public static final int OPERATION_PARSE_KORPUSES = 103;
+    public static final int OPERATION_PARSE_FLATS = 104;
 
     public Operations() {
         super();
