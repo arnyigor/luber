@@ -1,42 +1,39 @@
 package com.arny.lubereckiy.utils;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.View;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import com.arny.lubereckiy.R;
-import com.arny.lubereckiy.models.Korpus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 
-import static android.content.ContentValues.TAG;
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utility {
     private static TextToSpeech textToSpeech = null;
@@ -219,6 +216,17 @@ public class Utility {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static synchronized boolean checkServiceRunning(Class<?> serviceClass, Context context){
+        final ActivityManager activityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        final List<RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
+        for (RunningServiceInfo runningServiceInfo : services) {
+            if (runningServiceInfo.service.getClassName().equals(serviceClass.getName())){
                 return true;
             }
         }

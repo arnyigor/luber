@@ -32,30 +32,28 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         mMyServiceIntent = new Intent(context, BackgroundIntentService.class);
+        IntentFilter filter = new IntentFilter(BackgroundIntentService.ACTION);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter);
         tvRefreshing = (TextView) findViewById(R.id.tvRefreshing);
         buttonUpdate = (Button) findViewById(R.id.btnGetData);
         buttonUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startUpdate();
-                buttonUpdate.setEnabled(false);
+                boolean isRunning = Utility.checkServiceRunning(BackgroundIntentService.class, HomeActivity.this);
+                Log.i(HomeActivity.class.getSimpleName(), "onClick: isRunning = " + isRunning);
+                if (!isRunning) {
+                    startUpdate();
+                }
             }
         });
         if (!Utility.empty(Config.getString(Config.LAST_UPDATE, this))) {
             tvRefreshing.setText(getString(R.string.lastUpdateIs).concat(Config.getString(Config.LAST_UPDATE, this)));
         }
-//        findViewById(R.id.btnGet).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                setTitle("Обновление генплана");
-//                progressBar.setVisibility(View.VISIBLE);
-//                tvRefreshing.setVisibility(View.VISIBLE);
-//                startUpdate(context,operationIntent);
-//            }
-//        });
     }
 
     private void startUpdate() {
+//        buttonUpdate.setEnabled(false);
         tvRefreshing.setText(R.string.updateData);
         Config.remove(Config.LAST_UPDATE, this);
         mMyServiceIntent.putExtra(BackgroundIntentService.EXTRA_KEY_OPERATION_CODE, BackgroundIntentService.OPERATION_PARSE_GSON);
@@ -65,14 +63,14 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        IntentFilter filter = new IntentFilter(BackgroundIntentService.ACTION);
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter);
-//        initUpdate(Config.getString(Config.LAST_UPDATE, this));
+        initUpdate(Config.getString(Config.LAST_UPDATE, HomeActivity.this));
     }
 
     public void initUpdate(String lastupdate) {
-        if (Utility.isServiceRunning(BackgroundIntentService.class, this)) {
+        long startUpdate = System.currentTimeMillis();
+        boolean isRunning = Utility.checkServiceRunning(BackgroundIntentService.class, HomeActivity.this);
+        Log.i(HomeActivity.class.getSimpleName(), "initUpdate: isRunning = " + isRunning);
+        if (isRunning) {
             tvRefreshing.setText(R.string.updateData);
             buttonUpdate.setEnabled(false);
         }else{
@@ -87,27 +85,25 @@ public class HomeActivity extends AppCompatActivity {
                 tvRefreshing.setText(getString(R.string.lastUpdateIs).concat(Config.getString(Config.LAST_UPDATE, this)));
             }
         }
+        long finishUpdate = System.currentTimeMillis();
+        Log.i(HomeActivity.class.getSimpleName(), "initUpdate: time =  " + (finishUpdate-startUpdate));
     }
 
-    private static boolean isMustUpdate(String lastupdate) {
+    private boolean isMustUpdate(String lastupdate) {
         return Utility.empty(lastupdate) || isUpdateTimeOver(lastupdate);
     }
 
-    private static boolean isUpdateTimeOver(String lastupdate) {
+    private boolean isUpdateTimeOver(String lastupdate) {
         long lustUpdateTimeStamp = Utility.convertTimeStringToLong(lastupdate, "HH:mm dd MM yyyy");
-        Log.i(TAG, "isUpdateTimeOver: lastUpdate = " + Utility.getDateTime(lustUpdateTimeStamp));
         long currentTimeStamp = System.currentTimeMillis();
-        Log.i(TAG, "isUpdateTimeOver: currentTimeStamp = " + Utility.getDateTime(currentTimeStamp));
-        long overTime = (1000 * 60 * 60) * 1;//1 час
-        Log.i(TAG, "isUpdateTimeOver: diff = " + (currentTimeStamp - lustUpdateTimeStamp));
-        Log.i(TAG, "isUpdateTimeOver: overTime = " + overTime);
+        long overTime = (1000 * 60 * 60) * Config.getInt(Config.UPDATE_INTERVAL,HomeActivity.this,1);
         return (currentTimeStamp - lustUpdateTimeStamp) > overTime;
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    protected void onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        super.onDestroy();
     }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {

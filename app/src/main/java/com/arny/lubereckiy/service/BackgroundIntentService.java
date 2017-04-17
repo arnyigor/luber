@@ -4,9 +4,9 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
 import com.android.volley.VolleyError;
 import com.arny.lubereckiy.R;
-import com.arny.lubereckiy.db.DBProvider;
 import com.arny.lubereckiy.models.Flat;
 import com.arny.lubereckiy.models.Floor;
 import com.arny.lubereckiy.models.Korpus;
@@ -39,6 +39,12 @@ public class BackgroundIntentService extends IntentService {
 	private HashMap<String, String> hashMap;
 	private long start;
 
+	private static BackgroundIntentService instance = null;
+
+	public static boolean isInstanceCreated() {
+		return instance != null;
+	}
+
 	public int getOperation(){
 		return operation;
 	}
@@ -56,6 +62,7 @@ public class BackgroundIntentService extends IntentService {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		instance = this;
 	}
 
 	@Override
@@ -63,6 +70,7 @@ public class BackgroundIntentService extends IntentService {
 		Log.i(TAG, "onDestroy: ");
 		mIsStopped = true;
 		sendBroadcastIntent(getResultNotif());
+		instance = null;
 		super.onDestroy();
 	}
 
@@ -107,6 +115,7 @@ public class BackgroundIntentService extends IntentService {
 			case OPERATION_PARSE_GSON:
 				this.start = System.currentTimeMillis();
 				getKorpuses();
+				Log.i(BackgroundIntentService.class.getSimpleName(), "onHandleIntent: time = " +  +( System.currentTimeMillis() - start));
 				break;
 		}
 	}
@@ -120,7 +129,9 @@ public class BackgroundIntentService extends IntentService {
 					genPlanArray = new JSONArray(result);
 					JSONObject genPlanObj = new JSONObject(genPlanArray.get(0).toString()).getJSONObject("data");
 					JSONArray kopruses = new JSONArray(genPlanObj.get("sets_of_pathes").toString());
+					Log.i(BackgroundIntentService.class.getSimpleName(), "parseResultApi1: time = " +( System.currentTimeMillis() - start));
 					parseKorpuses(kopruses);
+					Log.i(BackgroundIntentService.class.getSimpleName(), "parseResultApi2: time = " +( System.currentTimeMillis() - start));
 				} catch (JSONException e) {
 					e.printStackTrace();
 					hashMap.put("error", e.getMessage());
@@ -136,19 +147,20 @@ public class BackgroundIntentService extends IntentService {
 		});
 	}
 
-	private void parseKorpuses(JSONArray kopruses) throws JSONException {
-//		for (int i = 0; i < kopruses.length(); i++) {
-		for (int i = 0; i < 2; i++) {
-			JSONObject korpusObject = new JSONObject(kopruses.get(i).toString());
+	private void parseKorpuses(final JSONArray korpuses) throws JSONException {
+		for (int i = 0; i < korpuses.length(); i++) {
+			JSONObject korpusObject = new JSONObject(korpuses.get(i).toString());
 			final Korpus korpus = API.getAPIKorpus(korpusObject);
 			Log.i(TAG, "parseKorpuses: korpus = " + korpus.getTitle());
-			DBProvider.updateOrInsertKorpus(getApplicationContext(), korpus);
+//			DBProvider.updateOrInsertKorpus(getApplicationContext(), korpus);
+			final int finalI = i;
 			API.requestSinglePage(getApplicationContext(), korpus.getKorpusID(), new onApiResult() {
 				@Override
 				public void parseResultApi(String method, String result) {
 					try {
 						JSONArray sections = API.getApiSections(result);
 						parseSections(sections, korpus);
+						Log.i(BackgroundIntentService.class.getSimpleName(), "parseResultApi: parseKorpuses finalI = " + finalI);
 					} catch (JSONException e) {
 						e.printStackTrace();
 						hashMap.put("error", e.getMessage());
@@ -163,23 +175,22 @@ public class BackgroundIntentService extends IntentService {
 				}
 			});
 		}
+		Config.setString(Config.LAST_UPDATE, Utility.getDateTime(System.currentTimeMillis(),"HH:mm dd MM yyyy"),getApplicationContext());
+		mIsSuccess = true;
 		Log.i(TAG, "parseKorpuses result time: " +( System.currentTimeMillis() - start));
 	}
 
 	private void parseSections(JSONArray sections, Korpus korpus) throws JSONException {
-//		for (int i = 0; i < sections.length(); i++) {
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < sections.length(); i++) {
 			JSONObject sectionJsonObject = new JSONObject(String.valueOf(sections.get(i)));
 			Section section = API.parceAPISection(sectionJsonObject, korpus);
-			DBProvider.updateOrInsertSection(getApplicationContext(), section);
+//			DBProvider.updateOrInsertSection(getApplicationContext(), section);
 			JSONObject floorsObject = new JSONObject(sectionJsonObject.getString("floors"));
 			int min = API.getMinItems(floorsObject);
 			int max = API.getMaxItems(floorsObject, min);
 			parseFloors(section, floorsObject, min, max, korpus);
 		}
-		Config.setString(Config.LAST_UPDATE, Utility.getDateTime(System.currentTimeMillis(),"HH:mm dd MM yyyy"),getApplicationContext());
-		mIsSuccess = true;
-		Log.i(TAG, "parseSections result time: " +( System.currentTimeMillis() - start));
+
 		onDestroy();
 	}
 
@@ -187,7 +198,7 @@ public class BackgroundIntentService extends IntentService {
 		for (int j = min; j < max; j++) {
 			JSONObject floorObject = new JSONObject(String.valueOf(floorsObject.get(String.valueOf(j))));
 			Floor floor = API.parseAPIFloor(section, j, floorObject, korpus);
-			DBProvider.updateOrInsertFloor(getApplicationContext(), floor);
+//			DBProvider.updateOrInsertFloor(getApplicationContext(), floor);
 			JSONArray flatsArray = new JSONArray(floorObject.getString("flats"));
 			parseFlats(section, floor, flatsArray, korpus);
 		}
@@ -197,7 +208,7 @@ public class BackgroundIntentService extends IntentService {
 		for (int k = 0; k < flatsArray.length(); k++) {
 			JSONObject flatJsonObject = new JSONObject(String.valueOf(flatsArray.get(k)));
 			Flat flat = API.parseAPIFlat(section, floor, flatJsonObject, korpus);
-			DBProvider.updateOrInsertFlat(getApplicationContext(), flat);
+//			DBProvider.updateOrInsertFlat(getApplicationContext(), flat);
 		}
 	}
 

@@ -1,6 +1,7 @@
 package com.arny.lubereckiy.network;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -23,11 +24,11 @@ import java.util.HashMap;
 import static android.content.ContentValues.TAG;
 
 public class API {
-    private static final String API_BASE_URL = "https://pik.ru/luberecky/";
-    private static final String API_FLAT_BASE_URL = "https://api.pik.ru/v1/flat?flat_id=";
-    private static final String API_URL_GEN_PLAN = "datapages?data=GenPlan";
-    private static final String API_URL_SINGLE_PAGE = "singlepage?data=ChessPlan&format=json&domain=pik.ru&id=";
-    private static final String REQUEST_TAG = "VolleyAPI";
+    public static final String API_BASE_URL = "https://pik.ru/luberecky/";
+    public static final String API_FLAT_BASE_URL = "https://api.pik.ru/v1/flat?flat_id=";
+    public static final String API_URL_GEN_PLAN = "datapages?data=GenPlan";
+    public static final String API_URL_SINGLE_PAGE = "singlepage?data=ChessPlan&format=json&domain=pik.ru&id=";
+    public static final String REQUEST_TAG = "VolleyAPI";
     public static final String GEN_PLAN = "GEN_PLAN";
     public static final String SINGLE_PAGE = "SINGLE_PAGE";
     private static RequestQueue mQueue;
@@ -53,12 +54,25 @@ public class API {
         mQueue.add(stringRequest);
     }
 
-    public static void requestGenPlan(Context context,onApiResult onApiResult){
-        request(context,API_URL_GEN_PLAN, GEN_PLAN, onApiResult);
+    public static void requestGenPlan(final Context context, final onApiResult onApiResult){
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                request(context,API_URL_GEN_PLAN, GEN_PLAN, onApiResult);
+                return null;
+            }
+        }.execute();
+
     }
 
-    public static void requestSinglePage(Context context,String korpusId,onApiResult onApiResult){
-        request(context,API_URL_SINGLE_PAGE + korpusId, SINGLE_PAGE, onApiResult);
+    public static void requestSinglePage(final Context context, final String korpusId, final onApiResult onApiResult){
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                request(context,API_URL_SINGLE_PAGE + korpusId, SINGLE_PAGE, onApiResult);
+                return null;
+            }
+        }.execute();
     }
 
     public static void stopAllRequests(){

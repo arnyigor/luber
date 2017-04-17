@@ -7,7 +7,8 @@ import android.preference.PreferenceManager;
 public class Config {
 
 	public static final String LAST_UPDATE = "lastUpdate";
-	private static SharedPreferences settings = null;
+    public static final String UPDATE_INTERVAL = "update_interval";
+    private static SharedPreferences settings = null;
 
     private static SharedPreferences getSettings(Context context) {
         if(settings == null) {
@@ -58,6 +59,20 @@ public class Config {
     public static Integer getInt(String key, Context context) {
         settings = getSettings(context);
         return settings.getInt(key, 0);
+    }
+
+    /**
+     * Получение конфига по ключу
+     * @param key
+     * Ключ
+     * @param context
+     * Контекст
+     * @return
+     * Значение конфига
+     */
+    public static Integer getInt(String key, Context context,int defaultVal) {
+        settings = getSettings(context);
+        return settings.getInt(key, defaultVal);
     }
 
     /**
