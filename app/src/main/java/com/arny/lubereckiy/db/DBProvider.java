@@ -12,9 +12,13 @@ import com.arny.lubereckiy.models.Floor;
 import com.arny.lubereckiy.models.Korpus;
 import com.arny.lubereckiy.models.Section;
 
+import static android.content.ContentValues.TAG;
 import static com.arny.lubereckiy.db.DBHelper.*;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class DBProvider {
 
@@ -90,7 +94,7 @@ public class DBProvider {
                 ",	`" + KORPUS_MINPRICE_1 + "`	INTEGER" +
                 ",	`" + KORPUS_MINPRICE_2 + "`	INTEGER" +
                 ",	`" + KORPUS_SOLD + "`	INTEGER" +
-                "`" + DATE_OF_MOVING_IN + "`	TEXT" +
+                ",	`" + DATE_OF_MOVING_IN + "` TEXT" +
                 ")";
     }
 
@@ -124,7 +128,6 @@ public class DBProvider {
     @NonNull
     private static ContentValues getKorpusValues(Korpus korpus) {
         ContentValues values = new ContentValues();
-        values.put(COLUMN_ID, korpus.getID());
         values.put(KORPUS_ID, korpus.getKorpusID());
         values.put(KORPUS_TITLE, korpus.getTitle());
         values.put(STATUS, korpus.getStatus());
@@ -150,6 +153,15 @@ public class DBProvider {
         return korpuses;
     }
 
+    public static Korpus getKorpus(Context context, String korpusID) {
+        String where = String.format("`%s`='%s'", KORPUS_ID, korpusID);
+        Cursor cursor = selectDB(context, TABLE_KORPUS, null, where, null);
+        if (cursor.moveToFirst()) {
+            return getCursorKorpus(cursor);
+        }
+        return null;
+    }
+
     public static Korpus getKorpus(Context context, int id) {
         Cursor cursor = selectDB(context, TABLE_KORPUS, null, COLUMN_ID + "=" + id, null);
         if (cursor.moveToFirst()) {
@@ -160,7 +172,7 @@ public class DBProvider {
 
     public static boolean updateKorpus(Context context, Korpus korpus) {
         ContentValues values = DBProvider.getKorpusValues(korpus);
-        String where = String.format("%s=%s", COLUMN_ID, korpus.getID());
+        String where = String.format("`%s`='%s'", KORPUS_ID, korpus.getKorpusID());
         return updateDB(context, TABLE_KORPUS, values, where) > 0;
     }
 
@@ -190,7 +202,6 @@ public class DBProvider {
     @NonNull
     private static ContentValues getSectionValues(Section section) {
         ContentValues values = new ContentValues();
-        values.put(COLUMN_ID, section.getID());
         values.put(SECTION_NAME, section.getName());
         values.put(KORPUS_ID, section.getKorpusID());
         values.put(SECTION_QUANTITY, section.getQuantity());
@@ -235,9 +246,18 @@ public class DBProvider {
         return null;
     }
 
+    public static Section getSection(Context context, String korpusID,String sectionName) {
+        String where = String.format("`%s`='%s' AND `%s`='%s'", KORPUS_ID, korpusID,SECTION_NAME,sectionName);
+        Cursor cursor = selectDB(context, TABLE_SECTION, null, where ,null,null);
+        if (cursor.moveToFirst()) {
+            return getCursorSection(cursor);
+        }
+        return null;
+    }
+
     public static boolean updateSection(Context context, Section section) {
         ContentValues values = DBProvider.getSectionValues(section);
-        String where = String.format("%s=%s", COLUMN_ID, section.getID());
+        String where = String.format("`%s`='%s' AND `%s`='%s'", KORPUS_ID, section.getKorpusID(),SECTION_NAME,section.getName());
         return updateDB(context, TABLE_SECTION, values, where) > 0;
     }
 
@@ -254,7 +274,6 @@ public class DBProvider {
     @NonNull
     private static ContentValues getFloorValues(Floor floor) {
         ContentValues values = new ContentValues();
-        values.put(COLUMN_ID, floor.getID());
         values.put(KORPUS_ID, floor.getKorpusID());
         values.put(SECTION_NAME, floor.getSectionName());
         values.put(FLOOR_NUMBER, floor.getFloorNumber());
@@ -285,6 +304,15 @@ public class DBProvider {
         return floor;
     }
 
+    public static Floor getFloor(Context context,String korpusID,String sectionName,int floorNum) {
+        String where = String.format("`%s`='%s' AND `%s`='%s' AND `%s`=%d", KORPUS_ID, korpusID,SECTION_NAME,sectionName,FLOOR_NUMBER,floorNum);
+        Cursor cursor = selectDB(context, TABLE_FLOOR, null, where, null,null);
+        if (cursor.moveToFirst()) {
+            return getCursorFloors(cursor);
+        }
+        return null;
+    }
+
     public static Floor getFloor(Context context, int id) {
         Cursor cursor = selectDB(context, TABLE_FLOOR, null, COLUMN_ID + "=" + id, null);
         if (cursor.moveToFirst()) {
@@ -295,7 +323,7 @@ public class DBProvider {
 
     public static boolean updateFloor(Context context, Floor floor) {
         ContentValues values = DBProvider.getFloorValues(floor);
-        String where = String.format("%s=%s", COLUMN_ID, floor.getID());
+        String where = String.format("`%s`='%s' AND `%s`='%s' AND `%s`=%d", KORPUS_ID, floor.getKorpusID(),SECTION_NAME,floor.getSectionName(),FLOOR_NUMBER,floor.getFloorNumber());
         return updateDB(context, TABLE_FLOOR, values, where) > 0;
     }
 
@@ -308,7 +336,6 @@ public class DBProvider {
         return insertDB(context, TABLE_FLOOR, getFloorValues(floor));
     }
 
-    /*Floor*/
     public static ArrayList<Flat> getFlats(Context context) {
         Cursor cursor = selectDB(context, TABLE_FLAT, null, null, null);
         ArrayList<Flat> flats = new ArrayList<>();
@@ -324,7 +351,6 @@ public class DBProvider {
     @NonNull
     private static ContentValues getFlatValues(Flat flat) {
         ContentValues values = new ContentValues();
-        values.put(COLUMN_ID, flat.getID());
         values.put(KORPUS_ID, flat.getKorpusID());
         values.put(SECTION_NAME, flat.getSectionName());
         values.put(FLOOR_NUMBER, flat.getFloorNumber());
@@ -350,7 +376,8 @@ public class DBProvider {
         flat.setWholeAreaBti(getDouble(cursor, WHOLE_AREA_BTI));
         flat.setWholePrice(getInt(cursor, WHOLE_PRICE));
         flat.setOfficePrice(getInt(cursor, OFFICE_PRICE));
-        flat.setDiscount(getBoolean(cursor, DISCOUNT));
+        int discount = getString(cursor, DISCOUNT).equals("false") ? 0 : getInt(cursor, DISCOUNT);
+        flat.setDiscount(discount);
         flat.setStatus(getString(cursor, STATUS));
         return flat;
     }
@@ -363,9 +390,18 @@ public class DBProvider {
         return null;
     }
 
+    public static Flat getFlat(Context context,String flatID) {
+        String where = String.format("`%s`='%s'", FLAT_ID, flatID);
+        Cursor cursor = selectDB(context, TABLE_FLAT, null, where, null);
+        if (cursor.moveToFirst()) {
+            return getCursorFlats(cursor);
+        }
+        return null;
+    }
+
     public static boolean updateFlat(Context context, Flat flat) {
         ContentValues values = DBProvider.getFlatValues(flat);
-        String where = String.format("%s=%s", COLUMN_ID, flat.getID());
+        String where = String.format("`%s`='%s'", COLUMN_ID, flat.getID());
         return updateDB(context, TABLE_FLAT, values, where) > 0;
     }
 
@@ -378,4 +414,64 @@ public class DBProvider {
         return insertDB(context, TABLE_FLAT, getFlatValues(flat));
     }
 
+    public static void updateOrInsertKorpus(Context context, Korpus newKorpus) {
+        Korpus oldKorpus = getKorpus(context, newKorpus.getKorpusID());
+        if (oldKorpus == null) {
+            addKorpus(context, newKorpus);
+        } else {
+            if (!oldKorpus.equals(newKorpus)) {
+                updateKorpus(context, newKorpus);
+            }
+        }
+    }
+
+    public static void updateOrInsertSection(Context context, Section newSection) {
+        Section oldSection = getSection(context, newSection.getKorpusID(),newSection.getName());
+        if (oldSection == null) {
+            addSection(context, newSection);
+        } else {
+            if (!oldSection.equals(newSection)) {
+                updateSection(context, newSection);
+            }
+        }
+    }
+
+    public static void updateOrInsertFloor(Context context, Floor newFloor) {
+        Floor oldFloor = getFloor(context,newFloor.getKorpusID(),newFloor.getSectionName(),newFloor.getFloorNumber() );
+        if (oldFloor == null) {
+            addFloor(context, newFloor);
+        } else {
+            if (!oldFloor.equals(newFloor)) {
+                updateFloor(context, newFloor);
+            }
+        }
+    }
+
+    public static void updateOrInsertFlat(Context context, Flat newFlat) {
+        Flat oldFlat = getFlat(context,newFlat.getFlatID());
+        if (oldFlat == null) {
+            addFlat(context, newFlat);
+        } else {
+            if (!oldFlat.equals(newFlat)) {
+                updateFlat(context, newFlat);
+            }
+        }
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">ЖК Люберецкий</string>
+    <string name="updateData">Обновление данных</string>
+    <string name="updateDataSuccess">Обновление данных завершено</string>
+    <string name="lastUpdateIs">Последнее обновление:</string>
+    <string name="service_operation_success">выполнено</string>
+    <string name="service_operation_fail">не выполнено</string>
 </resources>

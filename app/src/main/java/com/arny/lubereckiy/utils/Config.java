@@ -6,7 +6,8 @@ import android.preference.PreferenceManager;
 
 public class Config {
 
-    private static SharedPreferences settings = null;
+	public static final String LAST_UPDATE = "lastUpdate";
+	private static SharedPreferences settings = null;
 
     private static SharedPreferences getSettings(Context context) {
         if(settings == null) {

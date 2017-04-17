@@ -2,9 +2,11 @@ package com.arny.lubereckiy.utils;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
@@ -19,6 +21,8 @@ import android.view.View;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,9 +30,13 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.arny.lubereckiy.R;
+import com.arny.lubereckiy.models.Korpus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static android.content.ContentValues.TAG;
 
 public class Utility {
     private static TextToSpeech textToSpeech = null;
@@ -203,6 +211,10 @@ public class Utility {
         }
     }
 
+    public static String trimInside(String text) {
+        return text.trim().replace(" ", "");
+    }
+
     public static synchronized boolean isServiceRunning(Class<?> serviceClass, Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -213,7 +225,41 @@ public class Utility {
         return false;
     }
 
-    public static String trimInside(String text) {
-        return text.trim().replace(" ", "");
+    public static Collection<Field> getFields(Class<?> clazz) {
+        ArrayList<String> excluded=new ArrayList<>();
+        excluded.add("CREATOR");
+        excluded.add("shadow$_klass_");
+        excluded.add("serialVersionUID");
+        excluded.add("$change");
+        excluded.add("shadow$_monitor_");
+        Map<String, Field> fields = new HashMap<>();
+        while (clazz != null) {
+            for (Field field : clazz.getDeclaredFields()) {
+                if (!fields.containsKey(field.getName())) {
+                    if (!excluded.contains(field.getName())) {
+                        fields.put(field.getName(), field);
+                    }
+                }
+            }
+            clazz = clazz.getSuperclass();
+        }
+        return fields.values();
     }
+
+    public static void confirmDialog(Context context, String title, final DialogConfirmListener dialogConfirmListener){
+        new AlertDialog.Builder(context).setTitle(title + "?")
+                .setNegativeButton(context.getResources().getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        dialogConfirmListener.onCancel();
+                    }
+                }).setPositiveButton(context.getResources().getString(android.R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialogConfirmListener.onConfirm();
+            }
+        }).show();
+    }
+
 }

@@ -13,7 +13,7 @@ public class Flat implements Parcelable{
     private double wholeAreaBti;
     private int wholePrice;
     private int officePrice;
-    private boolean discount;
+    private int discount;
     private String status;
 
     public Flat() {
@@ -29,7 +29,7 @@ public class Flat implements Parcelable{
         wholeAreaBti = in.readDouble();
         wholePrice = in.readInt();
         officePrice = in.readInt();
-        discount = in.readByte() != 0;
+        discount = in.readInt();
         status = in.readString();
     }
 
@@ -85,11 +85,11 @@ public class Flat implements Parcelable{
         this.officePrice = officePrice;
     }
 
-    public boolean isDiscount() {
+    public int isDiscount() {
         return discount;
     }
 
-    public void setDiscount(boolean discount) {
+    public void setDiscount(int discount) {
         this.discount = discount;
     }
 
@@ -130,6 +130,13 @@ public class Flat implements Parcelable{
         return 0;
     }
 
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(floorNumber);
@@ -141,15 +148,24 @@ public class Flat implements Parcelable{
         dest.writeDouble(wholeAreaBti);
         dest.writeInt(wholePrice);
         dest.writeInt(officePrice);
-        dest.writeByte((byte) (discount ? 1 : 0));
+        dest.writeInt(discount);
         dest.writeString(status);
     }
 
-    public int getID() {
-        return ID;
-    }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (!(obj instanceof Flat)) {
+            return false;
+        }
+        Flat flat = (Flat) obj;
+        return status!=null && status.equals(flat.status)
+                && roomQuantity==flat.roomQuantity
+                && wholeAreaBti==flat.wholeAreaBti
+                && wholePrice==flat.wholePrice
+                && officePrice==flat.officePrice
+                && discount==flat.discount;
     }
+    
 }

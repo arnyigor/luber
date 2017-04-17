@@ -92,18 +92,6 @@ public class Section implements Parcelable{
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
-        dest.writeString(korpusID);
-        dest.writeInt(maxFlatsOnFloor);
-        dest.writeInt(quantity);
-        dest.writeInt(flatsDirection);
-        dest.writeInt(readiness);
-        dest.writeInt(firstFloorNumber);
-        dest.writeInt(ID);
-    }
-
     public int getID() {
         return ID;
     }
@@ -118,5 +106,31 @@ public class Section implements Parcelable{
 
     public void setKorpusID(String korpusID) {
         this.korpusID = korpusID;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(korpusID);
+        dest.writeInt(maxFlatsOnFloor);
+        dest.writeInt(quantity);
+        dest.writeInt(flatsDirection);
+        dest.writeInt(readiness);
+        dest.writeInt(firstFloorNumber);
+        dest.writeInt(ID);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (!(obj instanceof Section)) {
+            return false;
+        }
+        Section section = (Section) obj;
+        return maxFlatsOnFloor==section.maxFlatsOnFloor
+                && quantity==section.quantity
+                && flatsDirection==section.flatsDirection
+                && readiness==section.readiness
+                && firstFloorNumber==section.firstFloorNumber;
     }
 }

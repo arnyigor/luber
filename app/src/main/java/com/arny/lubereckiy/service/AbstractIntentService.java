@@ -1,5 +1,6 @@
 package com.arny.lubereckiy.service;
 
+import android.app.ActivityManager;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
@@ -20,42 +21,69 @@ import java.util.concurrent.ThreadPoolExecutor;
 public abstract class AbstractIntentService extends IntentService {
     /*Extras*/
     public static final String ACTION = "AbstractIntentService.action";
-    public static final String EXTRA_KEY_OPERATION_ID = "AbstractIntentService.operaton.id";
-    public static final String EXTRA_KEY_TYPE = "AbstractIntentService.type";
+    static final String EXTRA_KEY_OPERATION_ID = "AbstractIntentService.operaton.id";
     public static final String EXTRA_KEY_OPERATION = "AbstractIntentService.operaton";
     public static final int EXTRA_KEY_TYPE_SYNC = 0;
     public static final int EXTRA_KEY_TYPE_ASYNC = 1;
-    public static final String EXTRA_KEY_OPERATION_RESULT = "AbstractIntentService.operaton.result";
-    public static final String EXTRA_KEY_OPERATION_FINISH = "AbstractIntentService.operaton.finish";
-    public static final String EXTRA_KEY_OPERATION_FINISH_SUCCESS = "AbstractIntentService.operaton.success";
-    public static final String EXTRA_KEY_OPERATION_DATA = "AbstractIntentService.operatonId.data";
+    static final String EXTRA_KEY_OPERATION_RESULT = "AbstractIntentService.operaton.result";
+    static final String EXTRA_KEY_OPERATION_FINISH = "AbstractIntentService.operaton.finish";
+    static final String EXTRA_KEY_OPERATION_FINISH_SUCCESS = "AbstractIntentService.operaton.success";
+    static final String EXTRA_KEY_OPERATION_DATA = "AbstractIntentService.operatonId.data";
     /*other*/
-    protected static OperationProvider operation;
-    private static ArrayList<OperationProvider> operationsQueue;
+    protected OperationProvider operation;
+    private ArrayList<OperationProvider> operationsQueue;
     private static final int CORE_POOL_SIZE = 5;
     private static final int MAXIMUM_POOL_SIZE = 128;
     private static final int KEEP_ALIVE = 1;
-    protected abstract void runOperation(OperationProvider provider,OnOperationResult result);
+    protected Intent serviceIntent;
 
-    protected static OperationProvider getOperation() {
+
+    public static synchronized boolean isServiceRunning(Class<?> serviceClass, Context context) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.i(AbstractIntentService.class.getSimpleName(), "onDestroy: ");
+        super.onDestroy();
+    }
+
+    protected abstract void runOperation(OperationProvider provider, OnOperationResult result);
+
+    protected OperationProvider getOperation() {
         return operation;
     }
 
     protected void setOperation(OperationProvider operation) {
-        AbstractIntentService.operation = operation;
+        this.operation = operation;
     }
 
     protected interface OnOperationResult {
         void resultSuccess(OperationProvider provider);
         void resultFail(OperationProvider provider);
+        void resultUpdate(OperationProvider provider);
     }
 
-    // Launching the service
-    public static void onStartOperation(Context context, int type, int id, HashMap<String,Object> operationData) {
-        context.startService(new Intent(context, Operations.class)
+    public void onStartOperation(Context context, int type, int id, HashMap<String,Object> operationData,Intent intent) {
+        if (serviceIntent == null) {
+            serviceIntent = intent;
+        }
+        Log.i(AbstractIntentService.class.getSimpleName(), "onStartOperation: serviceIntent = " + serviceIntent);
+        context.startService(intent
                 .putExtra(Operations.EXTRA_KEY_OPERATION,
                         new OperationProvider(id,type,operationData)));
     }
+
+    public void onStopOperations() {
+        this.stopSelf();
+    }
+
 
     public AbstractIntentService() {
         super("AbstractIntentService");
@@ -167,6 +195,12 @@ public abstract class AbstractIntentService extends IntentService {
             public void resultFail(OperationProvider provider) {
                 provider.setFinished(true);
                 provider.setSuccess(false);
+                sendOperationResult(provider);
+            }
+
+            @Override
+            public void resultUpdate(OperationProvider provider) {
+                provider.setFinished(false);
                 sendOperationResult(provider);
             }
         });

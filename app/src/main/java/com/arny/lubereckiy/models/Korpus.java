@@ -2,6 +2,11 @@ package com.arny.lubereckiy.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import com.arny.lubereckiy.utils.Utility;
+
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Objects;
 
 public class Korpus implements Parcelable {
     private int ID;
@@ -152,4 +157,22 @@ public class Korpus implements Parcelable {
     public void setDateOfMovingIn(String dateOfMovingIn) {
         this.dateOfMovingIn = dateOfMovingIn;
     }
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) return true;
+		if (!(obj instanceof Korpus)) {
+			return false;
+		}
+		Korpus korpus = (Korpus) obj;
+		return title!=null && title.equals(korpus.title)
+				&& status!=null && status.equals(korpus.status)
+				&& finishing==korpus.finishing
+				&& free==korpus.free
+				&& busy==korpus.busy
+				&& minprice_1==korpus.minprice_1
+				&& minprice_2==korpus.minprice_2
+				&& sold==korpus.sold
+				&& dateOfMovingIn!=null && dateOfMovingIn.equals(korpus.dateOfMovingIn);
+	}
 }

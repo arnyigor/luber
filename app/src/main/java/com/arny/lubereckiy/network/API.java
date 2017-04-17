@@ -20,6 +20,8 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
+import static android.content.ContentValues.TAG;
+
 public class API {
     private static final String API_BASE_URL = "https://pik.ru/luberecky/";
     private static final String API_FLAT_BASE_URL = "https://api.pik.ru/v1/flat?flat_id=";
@@ -136,7 +138,8 @@ public class API {
         flat.setRoomQuantity(flatJsonObject.getInt("roomQuantity"));
         JSONObject statusObject = new JSONObject(flatJsonObject.getString("status"));
         flat.setStatus(statusObject.getString("title"));
-        flat.setDiscount(flatJsonObject.getBoolean("discount"));
+        int discount = flatJsonObject.getString("discount").equals("false") ? 0:Integer.parseInt(flatJsonObject.getString("discount"));
+        flat.setDiscount(discount);
         flat.setWholeAreaBti(flatJsonObject.getDouble("wholeAreaBti"));
         flat.setWholePrice(flatJsonObject.getInt("wholePrice"));
         flat.setOfficePrice(flatJsonObject.getInt("wholePrice"));
