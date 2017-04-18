@@ -150,6 +150,7 @@ public class DBProvider {
                 korpuses.add(korpus);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return korpuses;
     }
 
@@ -159,6 +160,7 @@ public class DBProvider {
         if (cursor.moveToFirst()) {
             return getCursorKorpus(cursor);
         }
+        cursor.close();
         return null;
     }
 
@@ -167,6 +169,7 @@ public class DBProvider {
         if (cursor.moveToFirst()) {
             return getCursorKorpus(cursor);
         }
+        cursor.close();
         return null;
     }
 
@@ -193,8 +196,10 @@ public class DBProvider {
         korpus.setTitle(getString(cursor, KORPUS_TITLE));
         korpus.setStatus(getString(cursor, STATUS));
         korpus.setFinishing(getBoolean(cursor, KORPUS_FINISHING));
-        korpus.setFree(getInt(cursor, COLUMN_ID));
         korpus.setDateOfMovingIn(getString(cursor, DATE_OF_MOVING_IN));
+        korpus.setBusy(getInt(cursor, KORPUS_BUSY));
+        korpus.setFree(getInt(cursor, KORPUS_FREE));
+        korpus.setSold(getInt(cursor, KORPUS_SOLD));
         return korpus;
     }
 
@@ -221,6 +226,7 @@ public class DBProvider {
                 sections.add(section);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return sections;
     }
 
@@ -243,6 +249,7 @@ public class DBProvider {
         if (cursor.moveToFirst()) {
             return getCursorSection(cursor);
         }
+        cursor.close();
         return null;
     }
 
@@ -252,6 +259,7 @@ public class DBProvider {
         if (cursor.moveToFirst()) {
             return getCursorSection(cursor);
         }
+        cursor.close();
         return null;
     }
 
@@ -290,6 +298,7 @@ public class DBProvider {
                 floors.add(floor);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return floors;
     }
 
@@ -310,6 +319,7 @@ public class DBProvider {
         if (cursor.moveToFirst()) {
             return getCursorFloors(cursor);
         }
+        cursor.close();
         return null;
     }
 
@@ -318,6 +328,7 @@ public class DBProvider {
         if (cursor.moveToFirst()) {
             return getCursorFloors(cursor);
         }
+        cursor.close();
         return null;
     }
 
@@ -345,8 +356,10 @@ public class DBProvider {
                 flats.add(flat);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return flats;
     }
+
 
     @NonNull
     private static ContentValues getFlatValues(Flat flat) {
@@ -387,6 +400,7 @@ public class DBProvider {
         if (cursor.moveToFirst()) {
             return getCursorFlats(cursor);
         }
+        cursor.close();
         return null;
     }
 
@@ -396,6 +410,7 @@ public class DBProvider {
         if (cursor.moveToFirst()) {
             return getCursorFlats(cursor);
         }
+        cursor.close();
         return null;
     }
 
@@ -415,22 +430,28 @@ public class DBProvider {
     }
 
     public static void updateOrInsertKorpus(Context context, Korpus newKorpus) {
+        long startGetKorp = System.currentTimeMillis();
         Korpus oldKorpus = getKorpus(context, newKorpus.getKorpusID());
         if (oldKorpus == null) {
+            long startAddkorp = System.currentTimeMillis();
             addKorpus(context, newKorpus);
         } else {
             if (!oldKorpus.equals(newKorpus)) {
+                long startUpdKorp = System.currentTimeMillis();
                 updateKorpus(context, newKorpus);
             }
         }
     }
 
     public static void updateOrInsertSection(Context context, Section newSection) {
+        long startGetSect = System.currentTimeMillis();
         Section oldSection = getSection(context, newSection.getKorpusID(),newSection.getName());
         if (oldSection == null) {
+            long startAddSect = System.currentTimeMillis();
             addSection(context, newSection);
         } else {
             if (!oldSection.equals(newSection)) {
+                long startUpdSect = System.currentTimeMillis();
                 updateSection(context, newSection);
             }
         }

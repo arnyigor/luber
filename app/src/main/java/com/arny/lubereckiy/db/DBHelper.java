@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 
 import static com.arny.lubereckiy.db.DBProvider.*;
@@ -71,6 +74,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return connectDB(context).query(table, columns, where, null, null, null, orderBy);
     }
 
+
     public static Cursor selectDB(Context context, String table, String[] columns, String where, String[] whereArgs, String orderBy) {
         return connectDB(context).query(table, columns, where, whereArgs, null, null, orderBy);
     }
@@ -109,13 +113,13 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     private static void disconnectDB() {
-        db.close();
+//        db.close();
     }
 
     private static SQLiteDatabase connectDB(Context context) {
-        if (db != null) {
-            db.close();
-        }
+//        if (db != null) {
+//            db.close();
+//        }
         db = DBHelper.getInstance(context);
         return db.getWritableDatabase();
     }

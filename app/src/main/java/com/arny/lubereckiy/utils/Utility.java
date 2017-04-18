@@ -10,6 +10,7 @@ import android.net.NetworkInfo;
 import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 
+import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -208,25 +209,46 @@ public class Utility {
         }
     }
 
+    /**
+     * дробная часть числа
+     *
+     * @param x
+     * @return
+     */
+    public static double fracal(double x) {
+        return x - (int) x;
+    }
+
+    /**
+     * целая часть числа
+     *
+     * @param x
+     * @return
+     */
+    public static int intact(double x) {
+        return (int) x;
+    }
+
+    public static String getExtendTime(long ms){
+        String def = ms + " ms";
+        if (ms>=1000 && ms<60000) {
+            int sec = (int)(ms/1000);
+            double mss = (double)ms;
+            mss = ((mss/1000) - sec)*1000;
+            int ms2 = (int)mss;
+            def = sec +  " sec " + ms2 + " ms";
+        }
+        return def;
+    }
+
     public static String trimInside(String text) {
         return text.trim().replace(" ", "");
     }
 
-    public static synchronized boolean isServiceRunning(Class<?> serviceClass, Context context) {
+    public static synchronized boolean isServiceRunning(Class<?> serviceClass, Context context){
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+        for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static synchronized boolean checkServiceRunning(Class<?> serviceClass, Context context){
-        final ActivityManager activityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
-        final List<RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
-        for (RunningServiceInfo runningServiceInfo : services) {
-            if (runningServiceInfo.service.getClassName().equals(serviceClass.getName())){
                 return true;
             }
         }

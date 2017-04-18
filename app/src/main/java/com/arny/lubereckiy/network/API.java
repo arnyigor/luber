@@ -4,11 +4,9 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
+import com.android.volley.*;
 import com.android.volley.toolbox.StringRequest;
+import com.arny.lubereckiy.ApplicationController;
 import com.arny.lubereckiy.models.Flat;
 import com.arny.lubereckiy.models.Floor;
 import com.arny.lubereckiy.models.Korpus;
@@ -33,11 +31,10 @@ public class API {
     public static final String SINGLE_PAGE = "SINGLE_PAGE";
     private static RequestQueue mQueue;
 
-    private static void request(Context context, String urlParams, final String method, final onApiResult onApiResult){
-        mQueue = VolleyRequestQueue.getInstance(context).getRequestQueue();
+    private static void request(String urlParams, final String method, final onApiResult onApiResult){
         String URL = API_BASE_URL + urlParams;
         Log.i(API.class.getSimpleName(), "request: URL = " + URL);
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
+        StringRequest request = new StringRequest(URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 //                Log.i(API.class.getSimpleName(), "onResponse: " + response);
@@ -45,40 +42,26 @@ public class API {
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError volleyError) {
-//                Log.i(API.class.getSimpleName(), "onErrorResponse: " + volleyError);
-                onApiResult.parseResultApi(method,volleyError);
+            public void onErrorResponse(VolleyError error) {
+//                Log.e(TAG, "onErrorResponse: error = ", error);
+                onApiResult.parseResultApi(method,error);
             }
         });
-        stringRequest.setTag(REQUEST_TAG);
-        mQueue.add(stringRequest);
+
+        request.setTag(REQUEST_TAG);
+        VolleySingleton.getInstance().getRequestQueue().add(request);
     }
 
-    public static void requestGenPlan(final Context context, final onApiResult onApiResult){
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                request(context,API_URL_GEN_PLAN, GEN_PLAN, onApiResult);
-                return null;
-            }
-        }.execute();
-
+    public static void requestGenPlan(final onApiResult onApiResult){
+        request(API_URL_GEN_PLAN, GEN_PLAN, onApiResult);
     }
 
-    public static void requestSinglePage(final Context context, final String korpusId, final onApiResult onApiResult){
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                request(context,API_URL_SINGLE_PAGE + korpusId, SINGLE_PAGE, onApiResult);
-                return null;
-            }
-        }.execute();
+    public static void requestSinglePage(final String korpusId, final onApiResult onApiResult){
+        request(API_URL_SINGLE_PAGE + korpusId, SINGLE_PAGE, onApiResult);
     }
 
     public static void stopAllRequests(){
-        if (mQueue != null) {
-            mQueue.cancelAll(REQUEST_TAG);
-        }
+        VolleySingleton.getInstance().getRequestQueue().cancelAll(REQUEST_TAG);
     }
 
     public static JSONArray parseAPIKorpuses(HashMap<String, Object> data) throws JSONException {
@@ -87,8 +70,7 @@ public class API {
         return new JSONArray(genPlanObj.get("sets_of_pathes").toString());
     }
 
-    public static Korpus getAPIKorpus(JSONObject korpusObject) throws JSONException {
-        Korpus korpus = new Korpus();
+    public static Korpus getAPIKorpus(Korpus korpus,JSONObject korpusObject) throws JSONException {
         korpus.setTitle(korpusObject.getString("title"));
         korpus.setKorpusID(korpusObject.getString("id"));
         korpus.setFree(Integer.parseInt(checkNullValue(korpusObject, "free", "0")));
@@ -124,8 +106,7 @@ public class API {
         return new JSONArray(korpus.get("sections").toString());
     }
 
-    public static Section parceAPISection(JSONObject sectionJsonObject, Korpus korpus) throws JSONException {
-        Section section = new Section();
+    public static Section parceAPISection(Section section,JSONObject sectionJsonObject, Korpus korpus) throws JSONException {
         section.setKorpusID(korpus.getKorpusID());
         section.setName(sectionJsonObject.getString("sectionName"));
         section.setQuantity(sectionJsonObject.getInt("quantity"));
@@ -134,8 +115,7 @@ public class API {
         return section;
     }
 
-    public static Floor parseAPIFloor(Section section, int j, JSONObject floorObject,Korpus korpus) throws JSONException {
-        Floor floor = new Floor();
+    public static Floor parseAPIFloor(Floor floor,Section section, int j, JSONObject floorObject,Korpus korpus) throws JSONException {
         floor.setKorpusID(korpus.getKorpusID());
         floor.setSectionName(section.getName());
         floor.setFloorNumber(j);
@@ -143,8 +123,7 @@ public class API {
         return floor;
     }
 
-    public static Flat parseAPIFlat(Section section, Floor floor, JSONObject flatJsonObject, Korpus korpus) throws JSONException {
-        Flat flat = new Flat();
+    public static Flat parseAPIFlat(Flat flat,Section section, Floor floor, JSONObject flatJsonObject, Korpus korpus) throws JSONException {
         flat.setKorpusID(korpus.getKorpusID());
         flat.setSectionName(section.getName());
         flat.setFloorNumber(floor.getFloorNumber());
@@ -161,6 +140,7 @@ public class API {
     }
 
     public static int getMaxItems(JSONObject items, int min) {
+
         int max = 0;
         while (true) {
             if (max <= min) {
