@@ -13,7 +13,10 @@ import com.arny.lubereckiy.models.Floor;
 import com.arny.lubereckiy.models.Korpus;
 import com.arny.lubereckiy.models.Section;
 import com.arny.lubereckiy.network.API;
+import com.arny.lubereckiy.network.ApiSendService;
 import com.arny.lubereckiy.network.onApiResult;
+import com.arny.lubereckiy.network.onApiResultCallback;
+import com.arny.lubereckiy.network.onApiResultError;
 import com.arny.lubereckiy.utils.Config;
 import com.arny.lubereckiy.utils.Utility;
 import org.json.JSONArray;
@@ -21,7 +24,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import static com.arny.lubereckiy.network.API.*;
 
 public class BackgroundIntentService extends IntentService {
 	/*Extras*/
@@ -44,8 +49,8 @@ public class BackgroundIntentService extends IntentService {
 	private Section sectionGlobal;
 	private Floor floorGlobal;
 	private Flat flatGlobal;
-	private Thread threadFloors[];
-	private Thread threadSections[];
+	private JSONObject jObject;
+	private JSONArray jArray;
 
 	public int getOperation(){
 		return operation;
@@ -114,31 +119,37 @@ public class BackgroundIntentService extends IntentService {
 		sectionGlobal = new Section();
 		floorGlobal = new Floor();
 		flatGlobal = new Flat();
-		setOperation(intent.getIntExtra(EXTRA_KEY_OPERATION_CODE, 0));
 		switch (getOperation()) {
 			case OPERATION_PARSE_GSON:
 				this.start = System.currentTimeMillis();
-				getKorpuses();
+				try {
+					Log.i(BackgroundIntentService.class.getSimpleName(), "onHandleIntent: ");
+					parseKorpuses();
+				} catch (JSONException | InterruptedException e) {
+					e.printStackTrace();
+				}
 				break;
 		}
 	}
 
 
 	private void getKorpuses() {
-		API.requestGenPlan(new onApiResult() {
+		API.requestGenPlan(getApplicationContext(),new onApiResult() {
 			@Override
 			public void parseResultApi(String method, String result) {
-				JSONArray genPlanArray = null;
-				try {
-					genPlanArray = new JSONArray(result);
-					JSONObject genPlanObj = new JSONObject(genPlanArray.get(0).toString()).getJSONObject("data");
-					JSONArray kopruses = new JSONArray(genPlanObj.get("sets_of_pathes").toString());
-					parseKorpuses(kopruses);
-				} catch (JSONException e) {
-					e.printStackTrace();
-					hashMap.put("error", e.getMessage());
-					mIsSuccess = false;
-				}
+//				try {
+//					jArray = new JSONArray(result);
+//					jObject = new JSONObject(jArray.get(0).toString()).getJSONObject("data");
+//					jArray = new JSONArray(jObject.get("sets_of_pathes").toString());
+//					Log.d(BackgroundIntentService.class.getSimpleName(), "getKorpuses: time " + (System.currentTimeMillis() - start));
+//					parseKorpuses(jArray);
+//				} catch (JSONException e) {
+//					e.printStackTrace();
+//					hashMap.put("error", e.getMessage());
+//					mIsSuccess = false;
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
 			}
 
 			@Override
@@ -149,34 +160,32 @@ public class BackgroundIntentService extends IntentService {
 		});
 	}
 
-	private void parseKorpuses(final JSONArray korpuses) throws JSONException {
-		for (int i = 0; i < korpuses.length(); i++) {
-			JSONObject korpusObject = new JSONObject(korpuses.get(i).toString());
-			API.getAPIKorpus(korpusGlobal,korpusObject);
-			DBProvider.updateOrInsertKorpus(getApplicationContext(), korpusGlobal);
-			API.requestSinglePage(korpusGlobal.getKorpusID(), new onApiResult() {
-				@Override
-				public void parseResultApi(String method, String result) {
-					try {
-						JSONArray sections = API.getApiSections(result);
-						parseSections(sections, korpusGlobal);
-						Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-						for (Thread thread :threadSet) {
-							Log.i(BackgroundIntentService.class.getSimpleName(), "parseResultApi: "  +  thread.getName() + "\nIs Daemon " + thread.isDaemon() + "\nIs Alive " + thread.isAlive());
-						}
-					} catch (JSONException e) {
-						e.printStackTrace();
-						hashMap.put("error", e.getMessage());
-						mIsSuccess = false;
-					}
-				}
-
-				@Override
-				public void parseResultApi(String method, VolleyError error) {
-					hashMap.put("error", error.toString());
-					mIsSuccess = false;
-				}
-			});
+	private void parseKorpuses() throws JSONException, InterruptedException {
+		Log.i(BackgroundIntentService.class.getSimpleName(), "parseKorpuses: ");
+		for (int i = 0; i < 20; i++) {
+//			jObject = new JSONObject(korpuses.get(i).toString());
+//			API.getAPIKorpus(korpusGlobal,jObject);
+//			DBProvider.updateOrInsertKorpus(getApplicationContext(), korpusGlobal);
+		ApiSendService.hostRequest(0, getApplicationContext(), "http://jsonplaceholder.typicode.com/users", new JSONObject(), new onApiResultCallback() {
+			@Override
+			public void callback(JSONObject response) {
+//				JSONArray sections = null;
+//				try {
+//					sections = API.getApiSections(response.toString());
+//
+////					parseSections(sections, korpusGlobal);
+//				} catch (JSONException e) {
+//					e.printStackTrace();
+//				}
+				Log.d(BackgroundIntentService.class.getSimpleName(), "parseResultApi: time = " + (System.currentTimeMillis() - start) + " response = " + response.toString());
+			}
+		}, new onApiResultError() {
+			@Override
+			public void callback(String message, int position) {
+				hashMap.put("error", message);
+				mIsSuccess = false;
+			}
+		});
 		}
 		Config.setString(Config.LAST_UPDATE, Utility.getDateTime(System.currentTimeMillis(),"HH:mm dd MM yyyy"),getApplicationContext());
 		mIsSuccess = true;
@@ -184,51 +193,40 @@ public class BackgroundIntentService extends IntentService {
 
 	private void parseSections(final JSONArray sections, final Korpus korpus) throws JSONException {
 		for (int i = 0; i < sections.length(); i++) {
-			final int finalI = i;
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						JSONObject sectionJsonObject = new JSONObject(String.valueOf(sections.get(finalI)));
-						API.parceAPISection(sectionGlobal, sectionJsonObject, korpus);
-						DBProvider.updateOrInsertSection(getApplicationContext(), sectionGlobal);
-						JSONObject floorsObject = new JSONObject(sectionJsonObject.getString("floors"));
-						int min = API.getMinItems(floorsObject);
-						int max = API.getMaxItems(floorsObject, min);
-						parseFloors(sectionGlobal, floorsObject, min, max, korpus);
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
-				}
-			}).start();
+			try {
+				jObject = new JSONObject(String.valueOf(sections.get(i)));
+				API.parceAPISection(sectionGlobal, jObject, korpus);
+//						DBProvider.updateOrInsertSection(getApplicationContext(), sectionGlobal);
+				jObject = new JSONObject(jObject.getString("floors"));
+				int min = API.getMinItems(jObject);
+				int max = API.getMaxItems(jObject, min);
+				parseFloors(sectionGlobal, jObject, min, max, korpus);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	private void parseFloors(final Section section, final JSONObject floorsObject, int min, int max, final Korpus korpus) throws JSONException {
 		for (int j = min; j < max; j++) {
 			final int finalJ = j;
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
 					try {
-						JSONObject floorObject = new JSONObject(String.valueOf(floorsObject.get(String.valueOf(finalJ))));
-						API.parseAPIFloor(floorGlobal, section, finalJ, floorObject, korpus);
-						DBProvider.updateOrInsertFloor(getApplicationContext(), floorGlobal);
-						JSONArray flatsArray = new JSONArray(floorObject.getString("flats"));
-						parseFlats(section, floorGlobal, flatsArray, korpus);
+						jObject = new JSONObject(String.valueOf(floorsObject.get(String.valueOf(finalJ))));
+						API.parseAPIFloor(floorGlobal, section, finalJ, jObject, korpus);
+//						DBProvider.updateOrInsertFloor(getApplicationContext(), floorGlobal);
+						jArray = new JSONArray(jObject.getString("flats"));
+						parseFlats(section, floorGlobal, jArray, korpus);
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}
-				}
-			}).start();
 		}
 	}
 
 	private void parseFlats(Section section, Floor floor, JSONArray flatsArray, Korpus korpus) throws JSONException {
 		for (int k = 0; k < flatsArray.length(); k++) {
-			JSONObject flatJsonObject = new JSONObject(String.valueOf(flatsArray.get(k)));
-			API.parseAPIFlat(flatGlobal,section, floor, flatJsonObject, korpus);
-			DBProvider.updateOrInsertFlat(getApplicationContext(), flatGlobal);
+			jObject = new JSONObject(String.valueOf(flatsArray.get(k)));
+			API.parseAPIFlat(flatGlobal,section, floor, jObject, korpus);
+//			DBProvider.updateOrInsertFlat(getApplicationContext(), flatGlobal);
 		}
 	}
 }

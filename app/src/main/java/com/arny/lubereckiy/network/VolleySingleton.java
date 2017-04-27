@@ -1,18 +1,18 @@
 package com.arny.lubereckiy.network;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
-import com.arny.lubereckiy.ApplicationController;
 
 public class VolleySingleton {
 	private static VolleySingleton mInstance = null;
 	private RequestQueue mRequestQueue;
 	private ImageLoader mImageLoader;
 
-	private VolleySingleton(){
-		mRequestQueue = Volley.newRequestQueue(ApplicationController.getAppContext());
+	private VolleySingleton(Context context){
+		mRequestQueue = Volley.newRequestQueue(context);
 		mImageLoader = new ImageLoader(this.mRequestQueue, new ImageLoader.ImageCache() {
 			private final LruCache<String, Bitmap> mCache = new LruCache<String, Bitmap>(10);
 			public void putBitmap(String url, Bitmap bitmap) {
@@ -24,9 +24,9 @@ public class VolleySingleton {
 		});
 	}
 
-	public static VolleySingleton getInstance(){
+	public static VolleySingleton getInstance(Context context){
 		if(mInstance == null){
-			mInstance = new VolleySingleton();
+			mInstance = new VolleySingleton(context);
 		}
 		return mInstance;
 	}

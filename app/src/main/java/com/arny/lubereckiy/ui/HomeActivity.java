@@ -97,21 +97,21 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter filter = new IntentFilter(BackgroundIntentService.ACTION);
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter);
-        Log.i(HomeActivity.class.getSimpleName(), "onResume: serviceRuning = " + Utility.isServiceRunning(BackgroundIntentService.class,this));
+//        IntentFilter filter = new IntentFilter(BackgroundIntentService.ACTION);
+//        filter.addCategory(Intent.CATEGORY_DEFAULT);
+//        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter);
+//        Log.i(HomeActivity.class.getSimpleName(), "onResume: serviceRuning = " + Utility.isServiceRunning(BackgroundIntentService.class,this));
 //        initUpdate(Config.getString(Config.LAST_UPDATE, HomeActivity.this));
     }
 
     @Override
     protected void onPause() {
-        long startPause = System.currentTimeMillis();
-        Log.i(HomeActivity.class.getSimpleName(), "onPause: start = " +  Utility.getDateTime(startPause) );
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
-        Log.i(HomeActivity.class.getSimpleName(), "onPause: finish register = " +(System.currentTimeMillis()-startPause) );
+//        long startPause = System.currentTimeMillis();
+//        Log.i(HomeActivity.class.getSimpleName(), "onPause: start = " +  Utility.getDateTime(startPause) );
+//        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+//        Log.i(HomeActivity.class.getSimpleName(), "onPause: finish register = " +(System.currentTimeMillis()-startPause) );
         super.onPause();
-        Log.i(HomeActivity.class.getSimpleName(), "onPause: finish pause = " +(System.currentTimeMillis()-startPause) );
+//        Log.i(HomeActivity.class.getSimpleName(), "onPause: finish pause = " +(System.currentTimeMillis()-startPause) );
     }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -123,26 +123,26 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            try {
-                finishOperation = intent.getBooleanExtra(BackgroundIntentService.EXTRA_KEY_FINISH, false);
-                mOperation = intent.getIntExtra(BackgroundIntentService.EXTRA_KEY_OPERATION_CODE, BackgroundIntentService.OPERATION_PARSE_GSON);
-                mOperationResult = intent.getStringExtra(BackgroundIntentService.EXTRA_KEY_OPERATION_RESULT);
-                operationSuccess = intent.getBooleanExtra(BackgroundIntentService.EXTRA_KEY_FINISH_SUCCESS, false);
-                hashMap = (HashMap<String, String>) intent.getSerializableExtra(BackgroundIntentService.EXTRA_KEY_OPERATION_DATA);
-//                Log.i(TAG, "onReceive: finishOperation = " + finishOperation);
-//                Log.i(TAG, "onReceive: mOperation = " + mOperation);
-//                Log.i(TAG, "onReceive: mOperationResult = " + mOperationResult);
-//                Log.i(TAG, "onReceive: operationSuccess = " + operationSuccess);
-//                Log.i(TAG, "onReceive: hashMap = " + hashMap);
-                if (finishOperation) {
-                    buttonUpdate.setEnabled(true);
-                    if (Config.getString(Config.LAST_UPDATE, HomeActivity.this) != null) {
-                        tvRefreshing.setText(getString(R.string.lastUpdateIs).concat(Config.getString(Config.LAST_UPDATE, HomeActivity.this)));
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                finishOperation = intent.getBooleanExtra(BackgroundIntentService.EXTRA_KEY_FINISH, false);
+//                mOperation = intent.getIntExtra(BackgroundIntentService.EXTRA_KEY_OPERATION_CODE, BackgroundIntentService.OPERATION_PARSE_GSON);
+//                mOperationResult = intent.getStringExtra(BackgroundIntentService.EXTRA_KEY_OPERATION_RESULT);
+//                operationSuccess = intent.getBooleanExtra(BackgroundIntentService.EXTRA_KEY_FINISH_SUCCESS, false);
+//                hashMap = (HashMap<String, String>) intent.getSerializableExtra(BackgroundIntentService.EXTRA_KEY_OPERATION_DATA);
+////                Log.i(TAG, "onReceive: finishOperation = " + finishOperation);
+////                Log.i(TAG, "onReceive: mOperation = " + mOperation);
+////                Log.i(TAG, "onReceive: mOperationResult = " + mOperationResult);
+////                Log.i(TAG, "onReceive: operationSuccess = " + operationSuccess);
+////                Log.i(TAG, "onReceive: hashMap = " + hashMap);
+//                if (finishOperation) {
+//                    buttonUpdate.setEnabled(true);
+//                    if (Config.getString(Config.LAST_UPDATE, HomeActivity.this) != null) {
+//                        tvRefreshing.setText(getString(R.string.lastUpdateIs).concat(Config.getString(Config.LAST_UPDATE, HomeActivity.this)));
+//                    }
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
         }
     };
