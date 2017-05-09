@@ -4,24 +4,17 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.arny.lubereckiy.models.Flat;
 import com.arny.lubereckiy.models.Floor;
 import com.arny.lubereckiy.models.Korpus;
 import com.arny.lubereckiy.models.Section;
 
-import static android.content.ContentValues.TAG;
-import static com.arny.lubereckiy.db.DBHelper.*;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Objects;
 
-public class DBProvider {
-
+public class DB {
 
     private static final String TABLE_SECTION = "section";
     private static final String TABLE_KORPUS = "korpus";
@@ -70,15 +63,15 @@ public class DBProvider {
     }
 
     private static String createSectionTable() {
-        return "CREATE TABLE `" + TABLE_SECTION + "` ( " +
-                "`" + COLUMN_ID + "`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,	" +
-                "`" + SECTION_NAME + "`	TEXT NOT NULL,	" +
-                "`" + KORPUS_ID + "` TEXT, " +
-                "`" + SECTION_QUANTITY + "`	TEXT,	" +
-                "`" + SECTION_FIRST_FLOOR_NUMBER + "` INTEGER, " +
-                "`" + SECTION_MAX_FLOOR_FLATS + "` INTEGER, " +
-                "`" + SECTION_FLATS_DIRECTION + "` INTEGER, " +
-                "`" + SECTION_READINESS + "` INTEGER" +
+        return "CREATE TABLE `section` ( " +
+                "`_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,	" +
+                "`section_name`	TEXT NOT NULL,	" +
+                "`korpusID` TEXT, " +
+                "`section_quantity`	TEXT,	" +
+                "`section_first_floor_number` INTEGER, " +
+                "`section_max_floor_flats` INTEGER, " +
+                "`flats_direction` INTEGER, " +
+                "`readiness` INTEGER" +
                 ")";
     }
 
@@ -480,19 +473,4 @@ public class DBProvider {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

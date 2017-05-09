@@ -1,21 +1,20 @@
 package com.arny.lubereckiy.network;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.*;
-import com.android.volley.toolbox.StringRequest;
 import com.arny.lubereckiy.models.Flat;
 import com.arny.lubereckiy.models.Floor;
 import com.arny.lubereckiy.models.Korpus;
 import com.arny.lubereckiy.models.Section;
-import com.arny.lubereckiy.utils.Utility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+
+import pw.aristos.arnylib.utils.Utility;
 
 public class API {
     public static final String API_BASE_URL = "https://pik.ru/luberecky/";
@@ -27,26 +26,6 @@ public class API {
     public static final String SINGLE_PAGE = "SINGLE_PAGE";
     private static RequestQueue mQueue;
 
-    private static void request(Context context,String urlParams, final String method, final onApiResult onApiResult){
-        String URL = API_BASE_URL + urlParams;
-        Log.i(API.class.getSimpleName(), "request: URL = " + URL);
-        StringRequest request = new StringRequest(URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-//                Log.i(API.class.getSimpleName(), "onResponse: " + response);
-                onApiResult.parseResultApi(method,response);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-//                Log.e(TAG, "onErrorResponse: error = ", error);
-                onApiResult.parseResultApi(method,error);
-            }
-        });
-
-        request.setTag(REQUEST_TAG);
-        VolleySingleton.getInstance(context).getRequestQueue().add(request);
-    }
 
     public static void requestGenPlan(Context context,final onApiResult onApiResult){
         request(context,API_URL_GEN_PLAN, GEN_PLAN, onApiResult);
@@ -54,10 +33,6 @@ public class API {
 
     public static void requestSinglePage(Context context,final String korpusId, final onApiResult onApiResult){
         request(context,API_URL_SINGLE_PAGE + korpusId, SINGLE_PAGE, onApiResult);
-    }
-
-    public static void stopAllRequests(Context context){
-        VolleySingleton.getInstance(context).getRequestQueue().cancelAll(REQUEST_TAG);
     }
 
     public static JSONArray parseAPIKorpuses(HashMap<String, Object> data) throws JSONException {

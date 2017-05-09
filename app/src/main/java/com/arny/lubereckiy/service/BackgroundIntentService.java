@@ -7,26 +7,20 @@ import android.util.Log;
 
 import com.android.volley.VolleyError;
 import com.arny.lubereckiy.R;
-import com.arny.lubereckiy.db.DBProvider;
 import com.arny.lubereckiy.models.Flat;
 import com.arny.lubereckiy.models.Floor;
 import com.arny.lubereckiy.models.Korpus;
 import com.arny.lubereckiy.models.Section;
 import com.arny.lubereckiy.network.API;
-import com.arny.lubereckiy.network.ApiSendService;
-import com.arny.lubereckiy.network.onApiResult;
-import com.arny.lubereckiy.network.onApiResultCallback;
-import com.arny.lubereckiy.network.onApiResultError;
-import com.arny.lubereckiy.utils.Config;
-import com.arny.lubereckiy.utils.Utility;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
-import static com.arny.lubereckiy.network.API.*;
+import pw.aristos.arnylib.utils.Config;
+import pw.aristos.arnylib.utils.Utility;
 
 public class BackgroundIntentService extends IntentService {
 	/*Extras*/
@@ -187,7 +181,7 @@ public class BackgroundIntentService extends IntentService {
 			}
 		});
 		}
-		Config.setString(Config.LAST_UPDATE, Utility.getDateTime(System.currentTimeMillis(),"HH:mm dd MM yyyy"),getApplicationContext());
+		Config.setString(LAST_UPDATE, Utility.getDateTime(System.currentTimeMillis(),"HH:mm dd MM yyyy"),getApplicationContext());
 		mIsSuccess = true;
 	}
 

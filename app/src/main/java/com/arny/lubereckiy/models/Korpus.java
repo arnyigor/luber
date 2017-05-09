@@ -2,11 +2,6 @@ package com.arny.lubereckiy.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.arny.lubereckiy.utils.Utility;
-
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Objects;
 
 public class Korpus implements Parcelable {
     private int ID;
