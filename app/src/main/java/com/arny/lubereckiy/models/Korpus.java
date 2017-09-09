@@ -1,56 +1,81 @@
+
 package com.arny.lubereckiy.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-public class Korpus implements Parcelable {
-    private int ID;
-    private String korpusID;
-    private String title;
+public class Korpus {
+
+    @SerializedName("status")
+    @Expose
     private String status;
-    private boolean finishing;
-    private int free;
-    private int busy;
-    private int minprice_1;
-    private int minprice_2;
-    private int sold;
-    private String dateOfMovingIn ;
+    @SerializedName("title")
+    @Expose
+    private String title;
+    @SerializedName("type")
+    @Expose
+    private String type;
+    @SerializedName("id")
+    @Expose
+    private String id;
+    @SerializedName("color")
+    @Expose
+    private String color;
+    @SerializedName("hint")
+    @Expose
+    private Hint hint;
+    @SerializedName("coords")
+    @Expose
+    private String coords;
+    @SerializedName("coordsOuter")
+    @Expose
+    private String coordsOuter;
+    @SerializedName("dateOfMovingIn")
+    @Expose
+    private String dateOfMovingIn;
+    @SerializedName("minprice_s")
+    @Expose
+    private String minpriceS;
+    @SerializedName("minprice_1")
+    @Expose
+    private String minprice1;
+    @SerializedName("minprice_2")
+    @Expose
+    private String minprice2;
+    @SerializedName("minprice_3")
+    @Expose
+    private String minprice3;
+    @SerializedName("minprice_4")
+    @Expose
+    private String minprice4;
+    @SerializedName("minprice_5")
+    @Expose
+    private String minprice5;
+    @SerializedName("free")
+    @Expose
+    private String free;
+    @SerializedName("busy")
+    @Expose
+    private String busy;
+    @SerializedName("sold")
+    @Expose
+    private String sold;
+    @SerializedName("discount")
+    @Expose
+    private Object discount;
+    @SerializedName("is_online")
+    @Expose
+    private Boolean isOnline;
+    @SerializedName("finishing")
+    @Expose
+    private String finishing;
 
-    public Korpus() {
+    public String getStatus() {
+        return status;
     }
 
-    protected Korpus(Parcel in) {
-        korpusID = in.readString();
-        title = in.readString();
-        dateOfMovingIn = in.readString();
-        status = in.readString();
-        finishing = in.readByte() != 0;
-        free = in.readInt();
-        busy = in.readInt();
-        ID = in.readInt();
-        minprice_1 = in.readInt();
-        minprice_2 = in.readInt();
-        sold = in.readInt();
-    }
-
-    public static final Creator<Korpus> CREATOR = new Creator<Korpus>() {
-        @Override
-        public Korpus createFromParcel(Parcel in) {
-            return new Korpus(in);
-        }
-
-        @Override
-        public Korpus[] newArray(int size) {
-            return new Korpus[size];
-        }
-    };
-
-    public String getKorpusID() {
-        return korpusID;
-    }
-
-    public void setKorpusID(String korpusID) {
-        this.korpusID = korpusID;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getTitle() {
@@ -61,88 +86,52 @@ public class Korpus implements Parcelable {
         this.title = title;
     }
 
-    public String getStatus() {
-        return status;
+    public String getType() {
+        return type;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public boolean isFinishing() {
-        return finishing;
+    public String getId() {
+        return id;
     }
 
-    public void setFinishing(boolean finishing) {
-        this.finishing = finishing;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public int getFree() {
-        return free;
+    public String getColor() {
+        return color;
     }
 
-    public void setFree(int free) {
-        this.free = free;
+    public void setColor(String color) {
+        this.color = color;
     }
 
-    public int getBusy() {
-        return busy;
+    public Hint getHint() {
+        return hint;
     }
 
-    public void setBusy(int busy) {
-        this.busy = busy;
+    public void setHint(Hint hint) {
+        this.hint = hint;
     }
 
-    public int getMinprice_1() {
-        return minprice_1;
+    public String getCoords() {
+        return coords;
     }
 
-    public void setMinprice_1(int minprice_1) {
-        this.minprice_1 = minprice_1;
+    public void setCoords(String coords) {
+        this.coords = coords;
     }
 
-    public int getMinprice_2() {
-        return minprice_2;
+    public String getCoordsOuter() {
+        return coordsOuter;
     }
 
-    public void setMinprice_2(int minprice_2) {
-        this.minprice_2 = minprice_2;
-    }
-
-    public int getSold() {
-        return sold;
-    }
-
-    public void setSold(int sold) {
-        this.sold = sold;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(korpusID);
-        dest.writeString(title);
-        dest.writeString(dateOfMovingIn);
-        dest.writeString(status);
-        dest.writeByte((byte) (finishing ? 1 : 0));
-        dest.writeInt(free);
-        dest.writeInt(busy);
-        dest.writeInt(minprice_1);
-        dest.writeInt(minprice_2);
-        dest.writeInt(sold);
-        dest.writeInt(ID);
-    }
-
-    public int getID() {
-        return ID;
-    }
-
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setCoordsOuter(String coordsOuter) {
+        this.coordsOuter = coordsOuter;
     }
 
     public String getDateOfMovingIn() {
@@ -153,21 +142,100 @@ public class Korpus implements Parcelable {
         this.dateOfMovingIn = dateOfMovingIn;
     }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == this) return true;
-		if (!(obj instanceof Korpus)) {
-			return false;
-		}
-		Korpus korpus = (Korpus) obj;
-		return title!=null && title.equals(korpus.title)
-				&& status!=null && status.equals(korpus.status)
-				&& finishing==korpus.finishing
-				&& free==korpus.free
-				&& busy==korpus.busy
-				&& minprice_1==korpus.minprice_1
-				&& minprice_2==korpus.minprice_2
-				&& sold==korpus.sold
-				&& dateOfMovingIn!=null && dateOfMovingIn.equals(korpus.dateOfMovingIn);
-	}
+    public String getMinpriceS() {
+        return minpriceS;
+    }
+
+    public void setMinpriceS(String minpriceS) {
+        this.minpriceS = minpriceS;
+    }
+
+    public String getMinprice1() {
+        return minprice1;
+    }
+
+    public void setMinprice1(String minprice1) {
+        this.minprice1 = minprice1;
+    }
+
+    public String getMinprice2() {
+        return minprice2;
+    }
+
+    public void setMinprice2(String minprice2) {
+        this.minprice2 = minprice2;
+    }
+
+    public String getMinprice3() {
+        return minprice3;
+    }
+
+    public void setMinprice3(String minprice3) {
+        this.minprice3 = minprice3;
+    }
+
+    public String getMinprice4() {
+        return minprice4;
+    }
+
+    public void setMinprice4(String minprice4) {
+        this.minprice4 = minprice4;
+    }
+
+    public String getMinprice5() {
+        return minprice5;
+    }
+
+    public void setMinprice5(String minprice5) {
+        this.minprice5 = minprice5;
+    }
+
+    public String getFree() {
+        return free;
+    }
+
+    public void setFree(String free) {
+        this.free = free;
+    }
+
+    public String getBusy() {
+        return busy;
+    }
+
+    public void setBusy(String busy) {
+        this.busy = busy;
+    }
+
+    public String getSold() {
+        return sold;
+    }
+
+    public void setSold(String sold) {
+        this.sold = sold;
+    }
+
+    public Object getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Object discount) {
+        this.discount = discount;
+    }
+
+    public Boolean getIsOnline() {
+        return isOnline;
+    }
+
+    public void setIsOnline(Boolean isOnline) {
+        this.isOnline = isOnline;
+    }
+
+    public String getFinishing() {
+        return finishing;
+    }
+
+    public void setFinishing(String finishing) {
+        this.finishing = finishing;
+    }
+
 }
