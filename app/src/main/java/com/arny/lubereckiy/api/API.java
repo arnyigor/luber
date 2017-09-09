@@ -13,7 +13,7 @@ public class API {
 	 * Все объекты М и МО (2,3)
 	 * metadata - данные
 	 */
-	public static final String API_ALL_OBJECTS = BASE_API_URL + "block?&types=1,2&metadata=1&statistics=1&locations=2,3";
+	public static final String API_ALL_OBJECTS = "block?&types=1,2&metadata=1&statistics=1&locations=2,3";
 	/**
 	 * План этажей
 	 */

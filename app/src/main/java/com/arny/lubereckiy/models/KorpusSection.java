@@ -30,9 +30,6 @@ public class KorpusSection {
     @SerializedName("plan")
     @Expose
     private String plan;
-    @SerializedName("floors")
-    @Expose
-    private Floors floors;
 
     public String getName() {
         return name;
@@ -96,14 +93,6 @@ public class KorpusSection {
 
     public void setPlan(String plan) {
         this.plan = plan;
-    }
-
-    public Floors getFloors() {
-        return floors;
-    }
-
-    public void setFloors(Floors floors) {
-        this.floors = floors;
     }
 
 }
