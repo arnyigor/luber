@@ -1,8 +1,11 @@
 <resources>
-    <string name="app_name">ЖК Люберецкий</string>
+    <string name="app_name">ПИК</string>
     <string name="updateData">Обновление данных</string>
     <string name="updateDataSuccess">Обновление данных завершено</string>
     <string name="lastUpdateIs">Последнее обновление:</string>
     <string name="service_operation_success">выполнено</string>
     <string name="service_operation_fail">не выполнено</string>
+    <string name="filter">Фильтр</string>
+    <string name="filter_min_price">Мин.цена</string>
+    <string name="filter_default">Обычный</string>
 </resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+            android:icon="@drawable/ic_filter"
+            app:showAsAction="ifRoom"
+            android:title="@string/filter">
+        <menu>
+            <item
+                    android:title="@string/filter_default"
+                    android:id="@+id/action_filter_default"/>
+            <item
+                    android:title="@string/filter_min_price"
+                    android:id="@+id/action_filter_min_price"/>
+        </menu>
+    </item>
+
+</menu>

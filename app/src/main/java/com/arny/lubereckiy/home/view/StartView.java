@@ -16,4 +16,8 @@ public interface StartView extends MvpView {
 	void showError(String error);
 
 	void setAdapterData(List<Pikobject> data);
+
+    void goToObjectMap(String uri);
+
+    void setFilteredData(List<Pikobject> data);
 }

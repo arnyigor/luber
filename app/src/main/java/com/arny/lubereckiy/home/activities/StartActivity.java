@@ -1,18 +1,17 @@
 package com.arny.lubereckiy.home.activities;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.OrientationHelper;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.*;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.view.Menu;
+import android.view.MenuItem;
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arny.arnylib.adapters.SimpleBindableAdapter;
+import com.arny.arnylib.utils.DroidUtils;
 import com.arny.arnylib.utils.ToastMaker;
 import com.arny.lubereckiy.R;
 import com.arny.lubereckiy.adapter.AllObjectsViewHolder;
@@ -22,44 +21,73 @@ import com.arny.lubereckiy.models.Pikobject;
 
 import java.util.List;
 
-public class StartActivity  extends MvpAppCompatActivity implements StartView {
+public class StartActivity  extends MvpAppCompatActivity implements StartView, SwipeRefreshLayout.OnRefreshListener {
 	@InjectPresenter
 	StartPresenter mPresenter;
 	private RecyclerView recyclerView;
-	private ProgressBar progressLoad;
-	private TextView tvLoadInfo;
 	private SimpleBindableAdapter adapter;
+    private List<Pikobject> objects;
+    private SwipeRefreshLayout mSwipeRefreshLayout ;
 
-	@Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 	    initUI();
-		mPresenter.loadAllObjects();
+        if (savedInstanceState == null) {
+            mPresenter.loadAllObjects();
+        }
     }
 
 	private void initUI() {
+        mSwipeRefreshLayout  = (SwipeRefreshLayout) findViewById(R.id.srl_all_list);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
 		recyclerView = (RecyclerView) findViewById(R.id.rv_all_objects);
-		recyclerView.setLayoutManager(new GridLayoutManager(this,2, OrientationHelper.VERTICAL,false));
+		recyclerView.setLayoutManager(new GridLayoutManager(this,1, OrientationHelper.VERTICAL,false));
 		recyclerView.setItemAnimator(new DefaultItemAnimator());
-		progressLoad = (ProgressBar) findViewById(R.id.progress_load);
-		tvLoadInfo = (TextView) findViewById(R.id.tv_load_info);
 		adapter = new SimpleBindableAdapter<>(this, R.layout.pikobject_list_item, AllObjectsViewHolder.class);
-		adapter.setActionListener((AllObjectsViewHolder.SimpleActionListener) (position, Item) ->
-						Log.i(StartActivity.class.getSimpleName(), "initAdapter: item = " + position));
-		recyclerView.setAdapter(adapter);
+		adapter.setActionListener(new AllObjectsViewHolder.SimpleActionListener() {
+            @Override
+            public void openMap(int position) {
+                mPresenter.showObjectMap(objects.get(position));
+            }
+
+            @Override
+            public void OnItemClickListener(int position, Object Item) {
+
+            }
+        });
+        recyclerView.setAdapter(adapter);
 	}
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_filter_min_price:
+                mPresenter.filterObjects(objects, StartPresenter.FilterObjectsType.minPrice);
+                break;
+            case R.id.action_filter_default:
+                mPresenter.filterObjects(objects, StartPresenter.FilterObjectsType.defaultType);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 	@Override
 	public void showLoadProgress() {
-		progressLoad.setVisibility(View.VISIBLE);
-		tvLoadInfo.setVisibility(View.VISIBLE);
+        mSwipeRefreshLayout.setRefreshing(true);
 	}
 
 	@Override
 	public void hideLoadProgress() {
-		progressLoad.setVisibility(View.GONE);
-		tvLoadInfo.setVisibility(View.GONE);
+        mSwipeRefreshLayout.setRefreshing(false);
 	}
 
 	@Override
@@ -70,6 +98,27 @@ public class StartActivity  extends MvpAppCompatActivity implements StartView {
 	@Override
 	public void setAdapterData(List<Pikobject> data) {
 		adapter.clear();
-		adapter.addAll(data);
+        objects = data;
+        adapter.addAll(objects);
+        DroidUtils.runLayoutAnimation(recyclerView,R.anim.layout_animation_fall_down);
 	}
+
+    @Override
+    public void goToObjectMap(String uri) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        startActivity(intent);
+    }
+
+    @Override
+    public void setFilteredData(List<Pikobject> data) {
+        Log.i(StartActivity.class.getSimpleName(), "setFilteredData: data = " +data.get(0));
+        adapter.clear();
+        adapter.addAll(objects);
+        DroidUtils.runLayoutAnimation(recyclerView,R.anim.layout_animation_fall_down);
+    }
+
+    @Override
+    public void onRefresh() {
+        mPresenter.loadAllObjects();
+    }
 }

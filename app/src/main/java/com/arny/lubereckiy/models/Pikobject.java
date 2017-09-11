@@ -66,6 +66,9 @@ public class Pikobject {
     @SerializedName("flats_all")
     @Expose
     private Integer flatsAll;
+    @SerializedName("img")
+    @Expose
+    private Img img;
     @SerializedName("location")
     @Expose
     private String location;
@@ -159,7 +162,7 @@ public class Pikobject {
         this.sticker = sticker;
     }
 
-    public Object getMetro() {
+    public String getMetro() {
         return metro;
     }
 
@@ -239,6 +242,14 @@ public class Pikobject {
         this.flatsAll = flatsAll;
     }
 
+    public Img getImg() {
+        return img;
+    }
+
+    public void setImg(Img img) {
+        this.img = img;
+    }
+
     public String getLocation() {
         return location;
     }
@@ -271,4 +282,8 @@ public class Pikobject {
         this.newDesign = newDesign;
     }
 
+    @Override
+    public String toString() {
+        return "title:" + name;
+    }
 }
