@@ -17,15 +17,15 @@ public class API {
 	/**
 	 * План этажей
 	 */
-	public static final String API_FLATPLANS = BASE_URL + "{object}/datapages?data=FlatPlans";
-	public static final String API_GENPLAN = BASE_URL + "{object}/datapages?data=GenPlan";
+	public static final String API_FLATPLANS ="{object}/datapages?data=FlatPlans";
+	public static final String API_GENPLAN = "{object}/datapages?data=GenPlan";
 	/**
 	 * Квартира
 	 */
-	public static final String API_SINGLE_FLAT = BASE_API_URL + "flat?flat_id={flatid}";
+	public static final String API_SINGLE_FLAT ="flat?flat_id={flatid}";
 	/**
 	 * Корпус
 	 */
-	public static final String API_SINGLE_CORPUS = BASE_URL + "{object}/singlepage?data=ChessPlan&format=json&domain=pik.ru&id={korpusid}";
+	public static final String API_SINGLE_CORPUS ="{object}/singlepage?data=ChessPlan&format=json&domain=pik.ru&id={korpusid}";
 
 }

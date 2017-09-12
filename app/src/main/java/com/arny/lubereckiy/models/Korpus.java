@@ -21,9 +21,6 @@ public class Korpus {
     @SerializedName("color")
     @Expose
     private String color;
-    @SerializedName("hint")
-    @Expose
-    private Hint hint;
     @SerializedName("coords")
     @Expose
     private String coords;
@@ -62,13 +59,18 @@ public class Korpus {
     private String sold;
     @SerializedName("discount")
     @Expose
-    private Object discount;
+    private String discount;
     @SerializedName("is_online")
     @Expose
     private Boolean isOnline;
     @SerializedName("finishing")
     @Expose
     private String finishing;
+
+    @Override
+    public String toString() {
+        return title;
+    }
 
     public String getStatus() {
         return status;
@@ -108,14 +110,6 @@ public class Korpus {
 
     public void setColor(String color) {
         this.color = color;
-    }
-
-    public Hint getHint() {
-        return hint;
-    }
-
-    public void setHint(Hint hint) {
-        this.hint = hint;
     }
 
     public String getCoords() {
@@ -214,11 +208,11 @@ public class Korpus {
         this.sold = sold;
     }
 
-    public Object getDiscount() {
+    public String getDiscount() {
         return discount;
     }
 
-    public void setDiscount(Object discount) {
+    public void setDiscount(String discount) {
         this.discount = discount;
     }
 

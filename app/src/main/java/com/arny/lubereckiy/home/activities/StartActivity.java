@@ -1,7 +1,6 @@
 package com.arny.lubereckiy.home.activities;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.*;
@@ -14,7 +13,7 @@ import com.arny.arnylib.adapters.SimpleBindableAdapter;
 import com.arny.arnylib.utils.DroidUtils;
 import com.arny.arnylib.utils.ToastMaker;
 import com.arny.lubereckiy.R;
-import com.arny.lubereckiy.adapter.AllObjectsViewHolder;
+import com.arny.lubereckiy.adapter.ObjectViewHolder;
 import com.arny.lubereckiy.home.presenter.StartPresenter;
 import com.arny.lubereckiy.home.view.StartView;
 import com.arny.lubereckiy.models.Pikobject;
@@ -45,8 +44,8 @@ public class StartActivity  extends MvpAppCompatActivity implements StartView, S
 		recyclerView = (RecyclerView) findViewById(R.id.rv_all_objects);
 		recyclerView.setLayoutManager(new GridLayoutManager(this,1, OrientationHelper.VERTICAL,false));
 		recyclerView.setItemAnimator(new DefaultItemAnimator());
-		adapter = new SimpleBindableAdapter<>(this, R.layout.pikobject_list_item, AllObjectsViewHolder.class);
-		adapter.setActionListener(new AllObjectsViewHolder.SimpleActionListener() {
+		adapter = new SimpleBindableAdapter<>(this, R.layout.pikobject_list_item, ObjectViewHolder.class);
+		adapter.setActionListener(new ObjectViewHolder.SimpleActionListener() {
             @Override
             public void openMap(int position) {
                 mPresenter.showObjectMap(objects.get(position));
@@ -54,7 +53,7 @@ public class StartActivity  extends MvpAppCompatActivity implements StartView, S
 
             @Override
             public void OnItemClickListener(int position, Object Item) {
-
+                mPresenter.viewObjectGenPlan(StartActivity.this,objects.get(position).getUrl());
             }
         });
         recyclerView.setAdapter(adapter);
@@ -95,7 +94,12 @@ public class StartActivity  extends MvpAppCompatActivity implements StartView, S
 		ToastMaker.toastError(this,error);
 	}
 
-	@Override
+    @Override
+    public void navigateTo(Intent intent) {
+        startActivity(intent);
+    }
+
+    @Override
 	public void setAdapterData(List<Pikobject> data) {
 		adapter.clear();
         objects = data;
@@ -104,16 +108,10 @@ public class StartActivity  extends MvpAppCompatActivity implements StartView, S
 	}
 
     @Override
-    public void goToObjectMap(String uri) {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-        startActivity(intent);
-    }
-
-    @Override
     public void setFilteredData(List<Pikobject> data) {
         Log.i(StartActivity.class.getSimpleName(), "setFilteredData: data = " +data.get(0));
         adapter.clear();
-        adapter.addAll(objects);
+        adapter.addAll(data);
         DroidUtils.runLayoutAnimation(recyclerView,R.anim.layout_animation_fall_down);
     }
 

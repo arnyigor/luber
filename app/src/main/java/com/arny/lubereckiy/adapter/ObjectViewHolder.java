@@ -13,12 +13,12 @@ import com.arny.lubereckiy.R;
 import com.arny.lubereckiy.models.Pikobject;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-public class AllObjectsViewHolder extends BindableViewHolder<Pikobject> implements View.OnClickListener {
+public class ObjectViewHolder extends BindableViewHolder<Pikobject> implements View.OnClickListener {
 
     private int position;
     private SimpleActionListener simpleActionListener;
 
-    public AllObjectsViewHolder(View itemView) {
+    public ObjectViewHolder(View itemView) {
         super(itemView);
     }
 

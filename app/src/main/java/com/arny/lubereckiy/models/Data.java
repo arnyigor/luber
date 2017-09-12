@@ -30,4 +30,8 @@ public class Data {
         this.korpuses = korpuses;
     }
 
+    @Override
+    public String toString() {
+        return "Корпуса:" + korpuses;
+    }
 }
