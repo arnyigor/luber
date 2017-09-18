@@ -3,8 +3,9 @@ package com.arny.lubereckiy.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import io.realm.RealmObject;
 
-public class Locations {
+public class Locations  extends RealmObject {
 
     @SerializedName("parent")
     @Expose

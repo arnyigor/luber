@@ -1,6 +1,7 @@
 package com.arny.lubereckiy.api;
 
 import com.arny.lubereckiy.models.GenPlan;
+import io.reactivex.Observable;
 import org.json.JSONArray;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -14,5 +15,5 @@ public interface PikobjectgenplanService {
             "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36"
     })
 	@GET(API.API_GENPLAN)
-	Call<List<GenPlan>> getObjectGenPlan(@Path("object") String object);
+    Observable<List<GenPlan>> getObjectGenPlan(@Path("object") String object);
 }

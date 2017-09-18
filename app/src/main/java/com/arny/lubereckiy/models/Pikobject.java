@@ -1,14 +1,22 @@
 
 package com.arny.lubereckiy.models;
 
+import com.arny.arnylib.database.DBProvider;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
-public class Pikobject {
+public class Pikobject  extends RealmObject {
+	@Override
+	public String toString() {
+		return DBProvider.getColumns(this);
+	}
 
-    @SerializedName("id")
+	@SerializedName("id")
     @Expose
-    private Integer id;
+	@PrimaryKey
+    private long id;
     @SerializedName("guid")
     @Expose
     private String guid;
@@ -82,11 +90,11 @@ public class Pikobject {
     @Expose
     private NewDesign newDesign;
 
-    public Integer getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -280,10 +288,5 @@ public class Pikobject {
 
     public void setNewDesign(NewDesign newDesign) {
         this.newDesign = newDesign;
-    }
-
-    @Override
-    public String toString() {
-        return "title:" + name;
     }
 }
