@@ -27,7 +27,7 @@ public class KorpusSection {
     private String quantity;
     @SerializedName("maxFlatsOnFloor")
     @Expose
-    private String maxFlatsOnFloor;
+    private int maxFlatsOnFloor;
     @SerializedName("firstFloorNumber")
     @Expose
     private String firstFloorNumber;
@@ -68,11 +68,11 @@ public class KorpusSection {
         this.quantity = quantity;
     }
 
-    public String getMaxFlatsOnFloor() {
+    public int getMaxFlatsOnFloor() {
         return maxFlatsOnFloor;
     }
 
-    public void setMaxFlatsOnFloor(String maxFlatsOnFloor) {
+    public void setMaxFlatsOnFloor(int maxFlatsOnFloor) {
         this.maxFlatsOnFloor = maxFlatsOnFloor;
     }
 

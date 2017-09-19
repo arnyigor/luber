@@ -1,6 +1,7 @@
 
 package com.arny.lubereckiy.models;
 
+import com.arny.arnylib.database.DBProvider;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -150,4 +151,8 @@ public class Flat {
         this.angle = angle;
     }
 
+    @Override
+    public String toString() {
+        return DBProvider.getColumns(this);
+    }
 }

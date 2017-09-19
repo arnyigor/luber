@@ -1,6 +1,7 @@
 package com.arny.lubereckiy.models;
 import java.util.List;
 
+import com.arny.arnylib.database.DBProvider;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -40,4 +41,8 @@ public class Floor {
         this.flats = flats;
     }
 
+    @Override
+    public String toString() {
+        return DBProvider.getColumns(this);
+    }
 }
