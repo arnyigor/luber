@@ -26,6 +26,6 @@ public class API {
 	/**
 	 * Корпус
 	 */
-	public static final String API_SINGLE_CORPUS ="{object}/singlepage?data=ChessPlan&format=json&domain=pik.ru&id={korpusid}";
+	public static final String API_SINGLE_CORPUS ="{object}/singlepage?data=ChessPlan&format=json&domain=pik.ru";
 
 }

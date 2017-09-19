@@ -13,14 +13,10 @@ import com.arny.arnylib.utils.MathUtils;
 import com.arny.lubereckiy.R;
 import com.arny.lubereckiy.models.Pikobject;
 import com.bumptech.glide.Glide;
-import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.views.MapView;
 public class ObjectViewHolder extends BindableViewHolder<Pikobject> implements View.OnClickListener {
 
 	private int position;
 	private SimpleActionListener simpleActionListener;
-	private MapView map;
 
 	public ObjectViewHolder(View itemView) {
 		super(itemView);
@@ -54,8 +50,6 @@ public class ObjectViewHolder extends BindableViewHolder<Pikobject> implements V
 				.load(imageMap)
 				.into(imObjPreview);
 		itemView.findViewById(R.id.imgbtn_openmap).setOnClickListener(this);
-		map = (MapView) itemView.findViewById(R.id.map);
-		map.setTileSource(TileSourceFactory.MAPNIK);
 	}
 
 	@Override
@@ -64,8 +58,6 @@ public class ObjectViewHolder extends BindableViewHolder<Pikobject> implements V
 			case R.id.imgbtn_openmap:
 				if (simpleActionListener != null) {
 					simpleActionListener.openMap(position);
-					/*Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context));
-					map.setVisibility(map.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);*/
 				}
 				break;
 		}

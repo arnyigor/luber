@@ -4,9 +4,8 @@ package com.arny.lubereckiy.models;
 import com.arny.arnylib.database.DBProvider;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import io.realm.RealmObject;
 
-public class Sticker  extends RealmObject {
+public class Sticker {
 
 	@Override
 	public String toString() {

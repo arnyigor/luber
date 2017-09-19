@@ -1,10 +1,20 @@
 
 package com.arny.lubereckiy.models;
 
+import com.arny.arnylib.database.DBProvider;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.LinkedHashMap;
+
 public class KorpusSection {
+
+    @Override
+    public String toString() {
+        return DBProvider.getColumns(this);
+    }
 
     @SerializedName("name")
     @Expose
@@ -30,6 +40,9 @@ public class KorpusSection {
     @SerializedName("plan")
     @Expose
     private String plan;
+    @SerializedName("floors")
+    @Expose
+    private LinkedHashMap<Integer,Floor> floors;
 
     public String getName() {
         return name;
@@ -95,4 +108,11 @@ public class KorpusSection {
         this.plan = plan;
     }
 
+    public LinkedHashMap<Integer, Floor> getFloors() {
+        return floors;
+    }
+
+    public void setFloors(LinkedHashMap<Integer, Floor> floors) {
+        this.floors = floors;
+    }
 }

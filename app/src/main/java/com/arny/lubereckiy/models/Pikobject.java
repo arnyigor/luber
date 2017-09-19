@@ -4,10 +4,8 @@ package com.arny.lubereckiy.models;
 import com.arny.arnylib.database.DBProvider;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
 
-public class Pikobject  extends RealmObject {
+public class Pikobject{
 	@Override
 	public String toString() {
 		return DBProvider.getColumns(this);
@@ -15,7 +13,6 @@ public class Pikobject  extends RealmObject {
 
 	@SerializedName("id")
     @Expose
-	@PrimaryKey
     private long id;
     @SerializedName("guid")
     @Expose

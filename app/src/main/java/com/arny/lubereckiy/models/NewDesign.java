@@ -3,9 +3,8 @@ package com.arny.lubereckiy.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import io.realm.RealmObject;
 
-public class NewDesign  extends RealmObject {
+public class NewDesign {
 
     @SerializedName("imageMap")
     @Expose
