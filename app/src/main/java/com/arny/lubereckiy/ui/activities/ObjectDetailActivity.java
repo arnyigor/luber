@@ -9,7 +9,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import com.arny.arnylib.adapters.SimpleBindableAdapter;
-import com.arny.arnylib.utils.DroidUtils;
 import com.arny.arnylib.utils.ToastMaker;
 import com.arny.lubereckiy.R;
 import com.arny.lubereckiy.adapter.KorpusesViewHolder;

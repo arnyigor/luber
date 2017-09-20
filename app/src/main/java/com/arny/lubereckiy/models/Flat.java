@@ -42,7 +42,7 @@ public class Flat {
     private Boolean finishing;
     @SerializedName("discount")
     @Expose
-    private Boolean discount;
+    private String discount;
     @SerializedName("angle")
     @Expose
     private String angle;
@@ -135,14 +135,6 @@ public class Flat {
         this.finishing = finishing;
     }
 
-    public Boolean getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(Boolean discount) {
-        this.discount = discount;
-    }
-
     public String getAngle() {
         return angle;
     }
@@ -154,5 +146,13 @@ public class Flat {
     @Override
     public String toString() {
         return DBProvider.getColumns(this);
+    }
+
+    public String getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(String discount) {
+        this.discount = discount;
     }
 }

@@ -1,17 +1,18 @@
 package com.arny.lubereckiy.ui.activities;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
+import android.view.SurfaceView;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ScrollView;
-import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.*;
+import com.arny.arnylib.adapters.OGArrayAdapter;
+import com.arny.arnylib.utils.Stopwatch;
+import com.arny.arnylib.utils.ToastMaker;
 import com.arny.lubereckiy.R;
 import com.arny.lubereckiy.common.Local;
 import com.arny.lubereckiy.models.KorpusSection;
@@ -20,18 +21,18 @@ import com.arny.lubereckiy.ui.graphics.FlatView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class KorpusViewActivity extends AppCompatActivity {
-    private ArrayList<Rect> rectangles;
-    private FrameLayout tvData;
+public class KorpusViewActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Spinner spinSection;
-	private ArrayList<FlatView> flats;
 	private DrawView drawView;
-	private ScrollView scrollView;
+    private List<KorpusSection> sections;
+    private SectionAdapter spinSectionsAdapter;
+    private ProgressBar progressDraw;
+    private String title;
+    private FrameLayout containerView;
 
-	@Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_korpus_view);
@@ -40,71 +41,96 @@ public class KorpusViewActivity extends AppCompatActivity {
         if (intent != null) {
             String object = intent.getStringExtra("object");
             String id = intent.getStringExtra("id");
+            title = intent.getStringExtra("title");
             fillUI(object, id);
         }
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        drawUI(sections.get(position));
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    private class SectionAdapter extends OGArrayAdapter<KorpusSection> {
+        public SectionAdapter(Context context, int textViewResourceId) {
+            super(context, textViewResourceId);
+        }
+
+        @Override
+        protected String getObjectName(KorpusSection obj) {
+            return obj.getName();
+        }
+    }
+
+
     private void initUI() {
-        tvData = (FrameLayout) findViewById(R.id.tv_data);
+        containerView = (FrameLayout) findViewById(R.id.container);
+        progressDraw = (ProgressBar) findViewById(R.id.progress_draw);
         spinSection = (Spinner) findViewById(R.id.spin_section);
+        spinSectionsAdapter = new SectionAdapter(this, R.layout.section_spinner_item);
+        spinSection.setAdapter(spinSectionsAdapter);
+        spinSection.setOnItemSelectedListener(this);
     }
 
     private void fillUI(String object, String id) {
         Local.getListkorpuses(object, id)
+//                .map(Local::filterEmptySections)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> {
+                    progressDraw.setVisibility(View.VISIBLE);
+                    spinSection.setVisibility(View.GONE);
+                    containerView.setVisibility(View.GONE);
+                })
                 .subscribe(
-                        korpusSections -> {
-                            drawUI(korpusSections);
-                        },
-                        Throwable::printStackTrace,
-                        () -> {
+                        this::setUIByData,
+                        throwable -> ToastMaker.toastError(this, throwable.getMessage()));
+    }
 
-                        });
+    private void setUIByData(List<KorpusSection> korpusSections) {
+        this.sections = korpusSections;
+        setTitle(title);
+        spinSectionsAdapter.addAll(sections);
+        drawUI(sections.get(0));
+        progressDraw.setVisibility(View.GONE);
+        spinSection.setVisibility(View.VISIBLE);
+        containerView.setVisibility(View.VISIBLE);
     }
 
     @SuppressLint("StaticFieldLeak")
-    private void drawUI(List<KorpusSection> korpusSections) {
-	    int width = tvData.getWidth();
-	    int height = tvData.getHeight();
-	    drawView = new DrawView(KorpusViewActivity.this, korpusSections.get(0),width,height);
+    private void drawUI(KorpusSection section) {
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.start();
+        int width = containerView.getWidth();
+	    int height = containerView.getHeight();
+	    drawView = new DrawView(KorpusViewActivity.this, section, width, height);
 	    drawView.setBackgroundColor(Color.argb(255,255,255,255));
-	    scrollView = new ScrollView(this);
-	    scrollView.addView(drawView);
-	    tvData.addView(scrollView);
-	    drawView.setOnTouchListener(drawListener);
-//        new AsyncTask<Void, Void, ArrayList<Rect>>() {
-//            @Override
-//            protected ArrayList<Rect> doInBackground(Void... voids) {
-//                return Local.getKorpusRects(korpusSections.get(MathUtils.randInt(0, korpusSections.size() - 1)),width,height);
-//            }
-//
-//            @Override
-//            protected void onPostExecute(ArrayList<Rect> rects) {
-//                super.onPostExecute(rects);
-//                rectangles = rects;
-//                DrawView drawView = new DrawView(KorpusViewActivity.this, korpusSections);
-//                drawView.setOnTouchListener(drawListener);
-//                drawView.setBackgroundColor(Color.WHITE);
-//                tvData.addView(drawView);
-//            }
-//        }.execute();
+        ScrollView scrollView = new ScrollView(this);
+        scrollView.addView(drawView);
+        containerView.addView(scrollView);
+        drawView.setOnTouchListener(drawListener);
+        System.out.println("drawUI:" + stopwatch.getElapsedTimeMili() + "ms");
     }
 
     View.OnTouchListener drawListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-	        float touchX = event.getRawX();
+            float touchX = event.getRawX();
             float touchY = event.getRawY();
-                switch (event.getAction()) {
-	                case MotionEvent.ACTION_DOWN:
-		                System.out.println("touch:x" + touchX + " y:" + touchY);
-		                for (FlatView flatView : drawView.getFlats()) {
-	                    int touchX1 = (int) touchX;
-	                    int touchY1 = (int) touchY;
-	                    if (flatView.contains(touchX1, touchY1)) {
-		                    System.out.println("rec:x" + flatView.centerX() + " y:" + flatView.centerY());
-		                    Toast.makeText(KorpusViewActivity.this, flatView.getFlat().getRoomQuantity(), Toast.LENGTH_SHORT).show();
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    System.out.println("touch:x" + touchX + " y:" + touchY);
+                    for (FlatView flatView : drawView.getFlats()) {
+                        int touchX1 = (int) touchX;
+                        int touchY1 = (int) touchY;
+                        if (flatView.contains(touchX1, touchY1)) {
+                            System.out.println("rec:x" + flatView.centerX() + " y:" + flatView.centerY());
+                            Toast.makeText(KorpusViewActivity.this, flatView.getFlat().getRoomQuantity(), Toast.LENGTH_SHORT).show();
                         }
                     }
                     break;

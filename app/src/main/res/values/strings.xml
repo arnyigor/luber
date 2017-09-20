@@ -8,4 +8,6 @@
     <string name="filter">Фильтр</string>
     <string name="filter_min_price">Мин.цена</string>
     <string name="filter_default">Обычный</string>
+    <string name="search_title">Поиск</string>
+    <string name="no_items">Нет данных</string>
 </resources>

@@ -5,7 +5,9 @@ import com.arny.arnylib.database.DBProvider;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Pikobject{
+import java.io.Serializable;
+
+public class Pikobject implements Serializable{
 	@Override
 	public String toString() {
 		return DBProvider.getColumns(this);

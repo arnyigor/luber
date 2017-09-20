@@ -63,32 +63,6 @@ public class Local {
 		navigateTo(context, new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
 	}
 
-	public static int getMaxFloors(JsonObject items, int min) {
-		int max = 0;
-		while (true) {
-			if (max <= min) {
-				max++;
-			} else if (max > min && items.has(String.valueOf(max))) {
-				max++;
-			} else {
-				break;
-			}
-		}
-		return max - 1;
-	}
-
-	public static int getMinFloors(JsonObject items) {
-		int min = 0;
-		while (true) {
-			if (items.has(String.valueOf(min))) {
-				break;
-			} else {
-				min++;
-			}
-		}
-		return min;
-	}
-
 	public static void viewObjectGenPlan(Context context, Pikobject pikobject) {
 		Intent intent = new Intent(context, ObjectDetailActivity.class);
 		intent.putExtra("url", pikobject.getUrl());
@@ -99,6 +73,7 @@ public class Local {
 	public static void viewKorpus(Context context, Korpus korpus, String object) {
 		Intent intent = new Intent(context, KorpusViewActivity.class);
 		intent.putExtra("id", korpus.getId());
+		intent.putExtra("title", korpus.getTitle());
 		intent.putExtra("object", object);
 		navigateTo(context, intent);
 	}
@@ -125,57 +100,113 @@ public class Local {
 		return sections;
 	}
 
+    /**
+     * Рисуем квартиры
+     * @param canvas
+     * @param section
+     * @param paint
+     * @param width
+     * @param height
+     * @return
+     */
 	public static ArrayList<FlatView> getSectionRects(Canvas canvas, KorpusSection section, Paint paint, int width, int height) {
 		int x = section.getMaxFlatsOnFloor();
 		LinkedHashMap<Integer, Floor> floors = section.getFloors();
 		int y = floors.size();
-		width -= (int)((float) width * 0.05) * 2;
+        int startBorder = (int) ((float) width * 0.1);
+        width -= startBorder * 2;
 		int block = (int) ((float) width / x);
 		int border = (int) ((float) block * 0.1);
 		int flatBlock = block - border;
 		System.out.println(section.getName() + " x:" + x + " y:" + y + "screen:" + width + "/" + height);
-		int left = border;
+        int left = startBorder;
 		int top = border;
 		int x_inc = flatBlock + (border * 2);
 		int y_inc = flatBlock + (border * 2);
 		int right = left + flatBlock;
 		int bottom = top + flatBlock;
 		paint.setColor(Color.GRAY);
+        paint.setStrokeWidth(3);
+        paint.setTextSize(20);
 		ArrayList<FlatView> flatViews = new ArrayList<>();
-		for (int i = 1; i <= y; i++) {
+		for (int i = y; i > 0; i--) {
+            paint.setColor(Color.BLACK);
+            canvas.drawText(String.valueOf(i), (float) startBorder - 10, (float) top+((float)flatBlock/2), paint);
 			Floor floor = floors.get(i);
 			if (floor != null) {
 				List<Flat> flats = floor.getFlats();
 				for (int j = 0; j < flats.size(); j++) {
-					paint.setStrokeWidth(3);
-					paint.setTextSize(20);
 					Flat flat = flats.get(j);
 					FlatView e = new FlatView(left, top, right, bottom, i - 1, j);
 					e.setFlat(flat);
 					paint.setColor(Color.GRAY);
-					canvas.drawText(flat.getRoomQuantity(), (float) e.centerX() - 10, (float) e.centerY() + 10, paint);
 					flatViews.add(e);
-					paint.setColor(Color.GRAY);
-					if (flat.ge)//// TODO: 20.09.2017  
-					canvas.drawRect(left, top, right, bottom,);
-
-					canvas.drawLine(left, top, right, top, paint);
-					canvas.drawLine(right, top, right, bottom, paint);
-					canvas.drawLine(right, bottom, left, bottom, paint);
-					canvas.drawLine(left, bottom, left, top, paint);
+                    Status status = flat.getStatus();
+                    if (status != null && status.getUrl() != null) {
+                        switch (status.getUrl()) {
+                            case "unavailable":
+                                paint.setColor(Color.GRAY);
+                                canvas.drawLine(left, top, right, top, paint);
+                                canvas.drawLine(right, top, right, bottom, paint);
+                                canvas.drawLine(right, bottom, left, bottom, paint);
+                                canvas.drawLine(left, bottom, left, top, paint);
+                                break;
+                            case "free":
+                                if (flat.getDiscount().equals("false")) {
+                                    paint.setColor(Color.GREEN);
+                                    canvas.drawRect(left, top, right, bottom,paint);
+                                    paint.setColor(Color.BLACK);
+                                    canvas.drawText(flat.getRoomQuantity(), (float) e.centerX() - 10, (float) e.centerY() + 10, paint);
+                                }else{
+                                    paint.setColor(Color.RED);
+                                    canvas.drawRect(left, top, right, bottom,paint);
+                                    paint.setColor(Color.WHITE);
+                                    canvas.drawText(flat.getRoomQuantity(), (float) e.centerX() - 10, (float) e.centerY() + 10, paint);
+                                }
+                                break;
+                            case "sold":
+                                paint.setColor(Color.GRAY);
+                                canvas.drawLine(left, top, right, top, paint);
+                                canvas.drawLine(right, top, right, bottom, paint);
+                                canvas.drawLine(right, bottom, left, bottom, paint);
+                                canvas.drawLine(left, bottom, left, top, paint);
+                                canvas.drawText(flat.getRoomQuantity(), (float) e.centerX() - 10, (float) e.centerY() + 10, paint);
+                                break;
+                        }
+                    }
 					left += x_inc;
 					right += x_inc;
 				}
 			}
 			top += y_inc;
 			bottom += y_inc;
-			left = border;
+			left = startBorder;
 			right = left + flatBlock;
 		}
 		return flatViews;
 	}
 
-	public enum FilterObjectsType {
+    @NonNull
+    public static ArrayList<KorpusSection> filterEmptySections(List<KorpusSection> korpusSections) {
+        ArrayList<KorpusSection> newMap = new ArrayList<>();
+        boolean sold,unavalable,free,reserve;
+        for (KorpusSection korpusSection : korpusSections) {
+            for (Map.Entry<Integer, Floor> integerFloorEntry : korpusSection.getFloors().entrySet()) {
+                for (Flat flat : integerFloorEntry.getValue().getFlats()) {
+                    sold = flat.getStatus().getUrl().equals("sold");
+                    free = flat.getStatus().getUrl().equals("free");
+                    reserve = flat.getStatus().getUrl().equals("reserve");
+                    if (!sold) {
+                        newMap.add(korpusSection);
+                        break;
+                    }
+                }
+            }
+        }
+        return newMap;
+    }
+
+    public enum FilterObjectsType {
 		defaultType,
 		minPrice
 	}
@@ -191,38 +222,5 @@ public class Local {
 				return objects;
 		}
 		return objects;
-	}
-
-	private static class RandomRect {
-		private int left;
-		private int top;
-		private int right;
-		private int bottom;
-
-		public int getLeft() {
-			return left;
-		}
-
-		public int getTop() {
-			return top;
-		}
-
-		public int getRight() {
-			return right;
-		}
-
-		public int getBottom() {
-			return bottom;
-		}
-
-		public RandomRect invoke() {
-			int min = MathUtils.randInt(0, 200);
-			int max = MathUtils.randInt(min, 200);
-			left = MathUtils.randInt(min, max);
-			top = MathUtils.randInt(min, max);
-			right = MathUtils.randInt(left, 200);
-			bottom = MathUtils.randInt(0, top);
-			return this;
-		}
 	}
 }
