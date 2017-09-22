@@ -6,7 +6,13 @@ public class API {
 		https://www.pik.ru/luberecky/datapages?data=FlatPlans//план этажей
 		https://www.pik.ru/luberecky/datapages?data=GenPlan//общий генплан
 		https://api.pik.ru/v1/flat?flat_id=CA72B0A1-03AE-E611-9FBE-001EC9D5643C//квартира
-		https://www.pik.ru/luberecky/singlepage?data=ChessPlan&id=293ecc9b-bfad-e611-9fbe-001ec9d5643c&private_key=1&format=json&domain=www.pik.ru//корпус*/
+		https://www.pik.ru/luberecky/singlepage?data=ChessPlan&id=293ecc9b-bfad-e611-9fbe-001ec9d5643c&private_key=1&format=json&domain=www.pik.ru//корпус
+		&locations=8,32//округа и города
+		&price_million=1// цена в млн
+		&price_from=4//цена от
+		&price_to=5//цена до
+		&settlement=2.2018//кварталы 1-4
+		*/
 	public static final String BASE_API_URL = "https://api.pik.ru/v1/";
 	public static final String BASE_URL = "https://www.pik.ru/";
 	/**

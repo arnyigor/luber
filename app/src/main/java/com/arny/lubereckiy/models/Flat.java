@@ -18,7 +18,7 @@ public class Flat {
     private String roomQuantity;
     @SerializedName("stageNumber1")
     @Expose
-    private String stageNumber1;
+    private int stageNumber1;
     @SerializedName("wholeAreaBti")
     @Expose
     private String wholeAreaBti;
@@ -71,11 +71,11 @@ public class Flat {
         this.roomQuantity = roomQuantity;
     }
 
-    public String getStageNumber1() {
+    public int getStageNumber1() {
         return stageNumber1;
     }
 
-    public void setStageNumber1(String stageNumber1) {
+    public void setStageNumber1(int stageNumber1) {
         this.stageNumber1 = stageNumber1;
     }
 

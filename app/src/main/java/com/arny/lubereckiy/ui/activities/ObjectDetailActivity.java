@@ -75,7 +75,7 @@ public class ObjectDetailActivity extends AppCompatActivity implements SwipeRefr
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         adapter = new SimpleBindableAdapter<>(this, R.layout.genplan_item, KorpusesViewHolder.class);
         adapter.setActionListener((KorpusesViewHolder.SimpleActionListener) (position, Item) -> {
-            Local.viewKorpus(ObjectDetailActivity.this, objects.get(position),url);
+            Local.viewKorpus(ObjectDetailActivity.this, objects.get(position),url,title);
         });
         recyclerView.setAdapter(adapter);
     }

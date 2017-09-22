@@ -13,6 +13,6 @@ public interface PikKorpusService {
     })
     @GET(API.API_SINGLE_CORPUS)
     Observable<KorpusData> getKorpus(
-            @Path("object") String objecturl,
+            @Path("object") String url,
             @Query("id") String id);
 }
