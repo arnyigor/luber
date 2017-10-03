@@ -11,6 +11,7 @@ import com.arny.arnylib.adapters.BindableViewHolder;
 import com.arny.arnylib.utils.DateTimeUtils;
 import com.arny.arnylib.utils.MathUtils;
 import com.arny.lubereckiy.R;
+import com.arny.lubereckiy.models.Img;
 import com.arny.lubereckiy.models.Pikobject;
 import com.bumptech.glide.Glide;
 public class ObjectViewHolder extends BindableViewHolder<Pikobject> implements View.OnClickListener {
@@ -45,10 +46,13 @@ public class ObjectViewHolder extends BindableViewHolder<Pikobject> implements V
 		double price = MathUtils.round((double) minPrice / 1000000, 3);
 		tvInfo.setText(String.format("%s\nОт:%s млн.%s \n[Все:%d/свободно:%d/резерв:%d]", item.getLocation(), String.valueOf(price), status, all, free, reserve));
 		ImageView imObjPreview = (ImageView) itemView.findViewById(R.id.iv_object_preview);
-		String imageMap = item.getImg().getMain();
-		Glide.with(context.getApplicationContext())
-				.load(imageMap)
-				.into(imObjPreview);
+        Img img = item.getImg();
+        if (img != null) {
+            String imageMap = img.getMain();
+            Glide.with(context.getApplicationContext())
+                    .load(imageMap)
+                    .into(imObjPreview);
+        }
 		itemView.findViewById(R.id.imgbtn_openmap).setOnClickListener(this);
 	}
 

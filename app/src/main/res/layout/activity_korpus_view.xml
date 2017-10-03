@@ -18,7 +18,14 @@
             android:id="@+id/spin_section"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+    <TableLayout
+            android:visibility="visible"
+            android:id="@+id/tableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+    </TableLayout>
     <GridView
+            android:visibility="gone"
             android:id="@+id/gridSection"
             android:background="@drawable/flat_bg"
             android:layout_margin="5dp"

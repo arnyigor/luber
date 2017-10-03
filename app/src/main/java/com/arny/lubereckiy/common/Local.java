@@ -5,15 +5,18 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 import com.arny.arnylib.adapters.RecyclerBindableAdapter;
-import com.arny.arnylib.adapters.SimpleBindableAdapter;
 import com.arny.arnylib.network.ApiFactory;
 import com.arny.arnylib.utils.DroidUtils;
-import com.arny.arnylib.utils.MathUtils;
 import com.arny.lubereckiy.R;
 import com.arny.lubereckiy.api.API;
 import com.arny.lubereckiy.api.PikKorpusService;
@@ -23,7 +26,6 @@ import com.arny.lubereckiy.models.*;
 import com.arny.lubereckiy.ui.activities.KorpusViewActivity;
 import com.arny.lubereckiy.ui.activities.ObjectDetailActivity;
 import com.arny.lubereckiy.ui.graphics.FlatView;
-import com.google.gson.JsonObject;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 
@@ -56,7 +58,7 @@ public class Local {
                     e.onNext(korpusData.getSections());
                     e.onComplete();
                 }))
-                .map(Local::getNotEmptySections);
+                .map(Local::filterEmptySections);
     }
 
     public static void showObjectMap(Context context, Pikobject pikobject) {
@@ -89,7 +91,7 @@ public class Local {
             adapter.clear();
         }
         adapter.addAll(items);
-        DroidUtils.runLayoutAnimation(recyclerView, R.anim.layout_animation_slide_right);
+        DroidUtils.runLayoutAnimation(recyclerView, R.anim.layout_animation_fall_down);
     }
 
     public static List<KorpusSection> getNotEmptySections(List<KorpusSection> korpusSections) {
@@ -100,6 +102,48 @@ public class Local {
             }
         }
         return sections;
+    }
+
+    public static String getFlatRoomCount(String cnt) {
+        switch (cnt) {
+            case "С": return "Студия";
+            case "1": return "Однокомнатная квартира";
+            case "2": return "Двухкомнатная квартира";
+            case "3": return "Трехкомнатная квартира";
+            case "4": return "Четырехкомнатная квартира";
+            default: return "Нет данных";
+        }
+    }
+
+    public static void setCell(int position, TextView textView, Flat flat, Context context, String url) {
+        switch (url) {
+            case "unavailable":
+                System.out.println(position + " unavailable");
+//                rowView.setOnClickListener(null);
+//                rowView.setClickable(false);
+                break;
+            case "free":
+                if (flat.getDiscount().equals("false")) {
+                    textView.setTextColor(Color.BLACK);
+                    textView.setBackgroundColor(Color.GREEN);
+                    textView.setText(flat.getRoomQuantity());
+                } else {
+                    textView.setTextColor(Color.WHITE);
+                    textView.setBackgroundColor(Color.RED);
+                    textView.setText(flat.getRoomQuantity());
+                }
+                break;
+            case "reserve":
+                textView.setTextColor(Color.BLACK);
+                textView.setBackgroundColor(Color.parseColor("#ffe0af"));
+                textView.setText(flat.getRoomQuantity());
+                break;
+            case "sold":
+                textView.setTextColor(Color.GRAY);
+                textView.setText(flat.getRoomQuantity());
+                textView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.flat_bg));
+                break;
+        }
     }
 
     public enum GridItemType{
@@ -113,15 +157,53 @@ public class Local {
         ListIterator<Map.Entry<Integer, Floor>> iterator = new ArrayList<>(floors.entrySet()).listIterator(floors.size());
         while (iterator.hasPrevious()) {
             Map.Entry<Integer, Floor> floorEntry = iterator.previous();
+            Integer floorNum = floorEntry.getKey();
             Floor floor = floorEntry.getValue();
             List<Flat> flats = floor.getFlats();
+            GridViewItem item = new GridViewItem();
+            item.setType(GridItemType.floorNum);
+            item.setFlat(null);
+            item.setFloorNum(floorNum);
+            flatViews.add(item);
             for (int j = flats.size() - 1; j >= 0; j--) {
+                Flat flat = getStagedFlat(flats, j);
+                item = new GridViewItem();
+                item.setType(GridItemType.flat);
+                item.setFlat(flat);
+                item.setFloorNum(floorNum);
+                flatViews.add(item);
+            }
+        }
+        return flatViews;
+    }
+
+    public static ArrayList<GridViewItem> getSectionFlatsArray(KorpusSection section, TableLayout tableLayout, Context context) {
+        LinkedHashMap<Integer, Floor> floors = section.getFloors();
+        ArrayList<GridViewItem> flatViews = new ArrayList<>();
+        ListIterator<Map.Entry<Integer, Floor>> iterator = new ArrayList<>(floors.entrySet()).listIterator(floors.size());
+        int fls = 0;
+        while (iterator.hasPrevious()) {
+            Map.Entry<Integer, Floor> floorEntry = iterator.previous();
+            Integer floorNum = floorEntry.getKey();
+            fls = floorNum;
+            Floor floor = floorEntry.getValue();
+            List<Flat> flats = floor.getFlats();
+            TableRow tableRow = new TableRow(context);
+            tableRow.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            for (int j = flats.size() - 1; j >= 0; j--) {
+                LayoutInflater systemService = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = systemService.inflate(R.layout.flat_item,null);
                 Flat flat = getStagedFlat(flats, j);
                 GridViewItem item = new GridViewItem();
                 item.setType(GridItemType.flat);
                 item.setFlat(flat);
+                item.setFloorNum(floorNum);
                 flatViews.add(item);
+                TextView textViewTitle = (TextView) view.findViewById(R.id.info);
+                setCell(j,textViewTitle, flat,context,flat.getStatus().getUrl());
+                tableRow.addView(view, j);
             }
+            tableLayout.addView(tableRow, fls);
         }
         return flatViews;
     }
@@ -185,7 +267,7 @@ public class Local {
         return flatViews;
     }
 
-    private static Flat getStagedFlat(List<Flat> flats, int pos) {
+    public static Flat getStagedFlat(List<Flat> flats, int pos) {
         for (Flat flat : flats) {
             if ((pos + 1) == flat.getStageNumber1()) {
                 return flat;
@@ -244,21 +326,29 @@ public class Local {
     @NonNull
     public static ArrayList<KorpusSection> filterEmptySections(List<KorpusSection> korpusSections) {
         ArrayList<KorpusSection> newMap = new ArrayList<>();
-        boolean sold, unavalable, free, reserve;
-        boolean wsold, wunavalable, wfree, wreserve;
+        boolean sold, unavalable, free, reserve,hasFlats;
         for (KorpusSection korpusSection : korpusSections) {
-            for (Map.Entry<Integer, Floor> integerFloorEntry : korpusSection.getFloors().entrySet()) {
-                for (Flat flat : integerFloorEntry.getValue().getFlats()) {
-                    sold = flat.getStatus().getUrl().equals("sold");
-                    free = flat.getStatus().getUrl().equals("free");
-                    reserve = flat.getStatus().getUrl().equals("reserve");
-                    if (!sold) {
-                        newMap.add(korpusSection);
+            hasFlats = false;
+            if (korpusSection.getFloors().size() > 0) {
+                for (Map.Entry<Integer, Floor> integerFloorEntry : korpusSection.getFloors().entrySet()) {
+                    if (hasFlats) {
                         break;
+                    }
+                    List<Flat> flats = integerFloorEntry.getValue().getFlats();
+                    for (Flat flat : flats) {
+                        String status = flat.getStatus().getUrl();
+                        sold = status.equals("sold");
+                        free = status.equals("free");
+                        reserve = status.equals("reserve");
+                        unavalable = status.equals("unavailable");
+                        if ((!unavalable && !sold) || free || reserve) {
+                            newMap.add(korpusSection);
+                            hasFlats = true;
+                            break;
+                        }
                     }
                 }
             }
-
         }
         return newMap;
     }

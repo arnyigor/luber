@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <ImageView
+            android:id="@+id/img_flat_view"
+            android:adjustViewBounds="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <TextView
+                android:id="@+id/tv_flat_status"
+                tools:text="Забронирована"
+                android:textSize="18sp"
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        <TextView
+                android:id="@+id/tv_floor_num"
+                tools:text="25эт"
+                android:textSize="18sp"
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_flat_status"
+                android:layout_alignLeft="@+id/tv_flat_status"
+                android:layout_alignStart="@+id/tv_flat_status"/>
+        <TextView
+                android:id="@+id/tv_flat_price"
+                tools:text="2.5 млн"
+                android:textSize="18sp"
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/tv_flat_status"
+                android:layout_alignBottom="@+id/tv_flat_status"
+                android:layout_toRightOf="@+id/tv_flat_status"
+                android:layout_toEndOf="@+id/tv_flat_status"/>
+        <TextView
+                android:id="@+id/tv_flat_area"
+                tools:text="60.5 кв.м."
+                android:textSize="18sp"
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_flat_status"
+                android:layout_toRightOf="@+id/tv_floor_num"
+                android:layout_toEndOf="@+id/tv_floor_num"/>
+    </RelativeLayout>
+    <Button
+            android:id="@+id/btn_flat_ok"
+            android:layout_gravity="center_horizontal"
+            android:text="Ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+</LinearLayout>

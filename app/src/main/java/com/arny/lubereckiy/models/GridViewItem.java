@@ -3,6 +3,7 @@ package com.arny.lubereckiy.models;
 import com.arny.lubereckiy.common.Local;
 public class GridViewItem {
     private Flat flat;
+    private int floorNum;
     private Local.GridItemType type;
 
     public Flat getFlat() {
@@ -19,5 +20,13 @@ public class GridViewItem {
 
     public void setType(Local.GridItemType type) {
         this.type = type;
+    }
+
+    public int getFloorNum() {
+        return floorNum;
+    }
+
+    public void setFloorNum(int floorNum) {
+        this.floorNum = floorNum;
     }
 }

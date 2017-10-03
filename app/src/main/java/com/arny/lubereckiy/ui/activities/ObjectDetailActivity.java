@@ -13,14 +13,17 @@ import com.arny.arnylib.utils.ToastMaker;
 import com.arny.lubereckiy.R;
 import com.arny.lubereckiy.adapter.KorpusesViewHolder;
 import com.arny.lubereckiy.common.Local;
+import com.arny.lubereckiy.models.Data;
 import com.arny.lubereckiy.models.GenPlan;
 import com.arny.lubereckiy.models.Korpus;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ObjectDetailActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -52,6 +55,15 @@ public class ObjectDetailActivity extends AppCompatActivity implements SwipeRefr
                         e.onNext(genPlans.get(0).getData().getKorpuses());
                         e.onComplete();
                     }))
+                    .map(korpuses -> {
+                        List<Korpus> list = new ArrayList<>();
+                        for (Korpus korpus : korpuses) {
+                            if (korpus.getType().equals("flats")) {
+                                list.add(korpus);
+                            }
+                        }
+                        return list;
+                    })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe(disposable -> mSwipeRefreshLayout.setRefreshing(true))

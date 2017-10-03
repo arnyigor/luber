@@ -37,6 +37,9 @@ public class Flat {
     @SerializedName("planId")
     @Expose
     private String planId;
+    @SerializedName("planing")
+    @Expose
+    private Planing planing;
     @SerializedName("finishing")
     @Expose
     private Boolean finishing;
@@ -154,5 +157,13 @@ public class Flat {
 
     public void setDiscount(String discount) {
         this.discount = discount;
+    }
+
+    public Planing getPlaning() {
+        return planing;
+    }
+
+    public void setPlaning(Planing planing) {
+        this.planing = planing;
     }
 }
