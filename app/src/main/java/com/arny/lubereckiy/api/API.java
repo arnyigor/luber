@@ -1,5 +1,14 @@
 package com.arny.lubereckiy.api;
 
+import com.arny.arnylib.network.ApiFactory;
+import com.arny.lubereckiy.common.Local;
+import com.arny.lubereckiy.models.GenPlan;
+import com.arny.lubereckiy.models.KorpusSection;
+import com.arny.lubereckiy.models.Pikobject;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+
+import java.util.List;
 public class API {
 	/*
 		https://api.pik.ru/v1/block?new_design=1&types=1,2&metadata=1&statistics=1//все объекты
@@ -8,6 +17,7 @@ public class API {
 		https://api.pik.ru/v1/flat?flat_id=CA72B0A1-03AE-E611-9FBE-001EC9D5643C//квартира
 		https://www.pik.ru/luberecky/singlepage?data=ChessPlan&id=293ecc9b-bfad-e611-9fbe-001ec9d5643c&private_key=1&format=json&domain=www.pik.ru//корпус
 		&locations=8,32//округа и города
+		&images=1//фото объектов
 		&price_million=1// цена в млн
 		&price_from=4//цена от
 		&price_to=5//цена до
@@ -34,4 +44,32 @@ public class API {
 	 */
 	public static final String API_SINGLE_CORPUS ="{object}/singlepage?data=ChessPlan&format=json&domain=pik.ru";
 
+    public static Observable<List<Pikobject>> loadPikObjects() {
+        return ApiFactory.getInstance()
+                .createService(PikApiService.class, BASE_API_URL)
+                .getObjects();
+    }
+
+    public static Observable<List<GenPlan>> loadGenplan(String object) {
+        if (object.startsWith("/")) {
+            object = object.substring(1);
+        }
+        return ApiFactory.getInstance()
+                .createService(PikApiService.class, BASE_URL)
+                .getObjectGenPlan(object);
+    }
+
+    public static Observable<List<KorpusSection>> getListkorpuses(String url, String id) {
+        if (url.startsWith("/")) {
+            url = url.substring(1);
+        }
+        return ApiFactory.getInstance()
+                .createService(PikApiService.class, BASE_URL)
+                .getKorpus(url, id)
+                .flatMap(korpusData -> Observable.create((ObservableOnSubscribe<List<KorpusSection>>) e -> {
+                    e.onNext(korpusData.getSections());
+                    e.onComplete();
+                }))
+                .map(Local::filterEmptySections);
+    }
 }

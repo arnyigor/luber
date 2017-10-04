@@ -2,64 +2,18 @@ package com.arny.lubereckiy.common;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 import com.arny.arnylib.adapters.RecyclerBindableAdapter;
-import com.arny.arnylib.network.ApiFactory;
 import com.arny.arnylib.utils.DroidUtils;
 import com.arny.lubereckiy.R;
-import com.arny.lubereckiy.api.API;
-import com.arny.lubereckiy.api.PikKorpusService;
-import com.arny.lubereckiy.api.PikObjectsService;
-import com.arny.lubereckiy.api.PikobjectgenplanService;
 import com.arny.lubereckiy.models.*;
 import com.arny.lubereckiy.ui.activities.KorpusViewActivity;
 import com.arny.lubereckiy.ui.activities.ObjectDetailActivity;
-import com.arny.lubereckiy.ui.graphics.FlatView;
-import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
 
 import java.util.*;
 public class Local {
-
-    public static Observable<List<Pikobject>> loadPikObjects() {
-        return ApiFactory.getInstance()
-                .createService(PikObjectsService.class, API.BASE_API_URL)
-                .getObjects();
-    }
-
-    public static Observable<List<GenPlan>> loadGenplan(String object) {
-        if (object.startsWith("/")) {
-            object = object.substring(1);
-        }
-        return ApiFactory.getInstance()
-                .createService(PikobjectgenplanService.class, API.BASE_URL)
-                .getObjectGenPlan(object);
-    }
-
-    public static Observable<List<KorpusSection>> getListkorpuses(String url, String id) {
-        if (url.startsWith("/")) {
-            url = url.substring(1);
-        }
-        return ApiFactory.getInstance()
-                .createService(PikKorpusService.class, API.BASE_URL)
-                .getKorpus(url, id)
-                .flatMap(korpusData -> Observable.create((ObservableOnSubscribe<List<KorpusSection>>) e -> {
-                    e.onNext(korpusData.getSections());
-                    e.onComplete();
-                }))
-                .map(Local::filterEmptySections);
-    }
 
     public static void showObjectMap(Context context, Pikobject pikobject) {
         String uri = String.format(Locale.ENGLISH, "geo:%f,%f", Double.parseDouble(pikobject.getLatitude()), Double.parseDouble(pikobject.getLongitude()));
@@ -94,84 +48,42 @@ public class Local {
         DroidUtils.runLayoutAnimation(recyclerView, R.anim.layout_animation_fall_down);
     }
 
-    public static List<KorpusSection> getNotEmptySections(List<KorpusSection> korpusSections) {
-        ArrayList<KorpusSection> sections = new ArrayList<>();
-        for (KorpusSection korpusSection : korpusSections) {
-            if (korpusSection.getFloors().size() > 0) {
-                sections.add(korpusSection);
-            }
-        }
-        return sections;
-    }
-
     public static String getFlatRoomCount(String cnt) {
         switch (cnt) {
-            case "С": return "Студия";
-            case "1": return "Однокомнатная квартира";
-            case "2": return "Двухкомнатная квартира";
-            case "3": return "Трехкомнатная квартира";
-            case "4": return "Четырехкомнатная квартира";
-            default: return "Нет данных";
+            case "С":
+                return "Студия";
+            case "1":
+                return "Однокомнатная квартира";
+            case "2":
+                return "Двухкомнатная квартира";
+            case "3":
+                return "Трехкомнатная квартира";
+            case "4":
+                return "Четырехкомнатная квартира";
+            default:
+                return "Нет данных";
         }
     }
 
-    public static void setCell(Context context, int position, TextView textView, GridViewItem item) {
-        if (item != null && item.getFlat() != null) {
-            String url = item.getFlat().getStatus().getUrl();
-            Flat flat = item.getFlat();
-            switch (url) {
-                case "unavailable":
-                    System.out.println(position + " unavailable");
-//                rowView.setOnClickListener(null);
-//                rowView.setClickable(false);
-                    break;
-                case "free":
-                    if (flat.getDiscount().equals("false")) {
-                        textView.setTextColor(Color.BLACK);
-                        textView.setBackgroundColor(Color.GREEN);
-                        textView.setText(flat.getRoomQuantity());
-                    } else {
-                        textView.setTextColor(Color.WHITE);
-                        textView.setBackgroundColor(Color.RED);
-                        textView.setText(flat.getRoomQuantity());
-                    }
-                    break;
-                case "reserve":
-                    textView.setTextColor(Color.BLACK);
-                    textView.setBackgroundColor(Color.parseColor("#ffe0af"));
-                    textView.setText(flat.getRoomQuantity());
-                    break;
-                case "sold":
-                    textView.setTextColor(Color.GRAY);
-                    textView.setText(flat.getRoomQuantity());
-                    textView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.flat_bg));
-                    break;
-            }
-        }
-    }
-
-    public enum GridItemType{
+    public enum GridItemType {
         floorNum,
         flat
     }
 
     public static ArrayList<GridViewItem> getSectionFlatsArray(KorpusSection section) {
         LinkedHashMap<Integer, Floor> floors = section.getFloors();
-        ArrayList<GridViewItem> flatViews = new ArrayList<>();
         ListIterator<Map.Entry<Integer, Floor>> iterator = new ArrayList<>(floors.entrySet()).listIterator(floors.size());
+        ArrayList<GridViewItem> flatViews = new ArrayList<>();
         while (iterator.hasPrevious()) {
             Map.Entry<Integer, Floor> floorEntry = iterator.previous();
             Integer floorNum = floorEntry.getKey();
+            System.out.println("floorNum:" +floorNum);
             Floor floor = floorEntry.getValue();
             List<Flat> flats = floor.getFlats();
-            GridViewItem item = new GridViewItem();
-            item.setType(GridItemType.floorNum);
-            item.setFlat(null);
-            item.setFloorNum(floorNum);
-            flatViews.add(item);
+            flatViews.add(getPreFlatItem(floorNum, floor));
             for (int j = flats.size() - 1; j >= 0; j--) {
                 Flat flat = getStagedFlat(flats, j);
-                item = new GridViewItem();
+                GridViewItem item = new GridViewItem();
                 item.setType(GridItemType.flat);
                 item.setFlat(flat);
                 item.setFloorNum(floorNum);
@@ -181,66 +93,31 @@ public class Local {
         return flatViews;
     }
 
-
     /**
-     * Рисуем квартиры
-     *
-     * @param canvas
-     * @param section
-     * @param paint
-     * @param width
-     * @param height
+     * Номер этажа
+     * @param floorNum
+     * @param floor
      * @return
      */
-    public static ArrayList<FlatView> getSectionRects(Canvas canvas, KorpusSection section, Paint paint, int width, int height) {
-        int x = section.getMaxFlatsOnFloor();
-        LinkedHashMap<Integer, Floor> floors = section.getFloors();
-        int y = floors.size();
-        int startBorder = (int) ((float) width * 0.1);
-        int width0 = width;
-        width -= startBorder * 2;
-        int block = (int) ((float) width / x);
-        int border = (int) ((float) block * 0.05);
-        int flatBlock = block - border;
-        System.out.println(section.getName() + " x:" + x + " y:" + y + "screen:" + width + "/" + height);
-        int left = startBorder;
-        int top = startBorder;
-        int x_inc = flatBlock + (border * 2);
-        int y_inc = flatBlock + (border * 2);
-        int right = left + flatBlock;
-        int bottom = top + flatBlock;
-        paint.setColor(Color.GRAY);
-        paint.setStrokeWidth(3);
-        paint.setTextSize(20);
-        ArrayList<FlatView> flatViews = new ArrayList<>();
-        int stopX = width0 - border;
-        int stopY = (y * block) + (startBorder * 2);
-        canvas.drawLine(border, border, stopX, border, paint);
-        canvas.drawLine(stopX, border, stopX, stopY, paint);
-        canvas.drawLine(stopX, stopY, border, stopY, paint);
-        canvas.drawLine(border, stopY, border, border, paint);
-        ListIterator<Map.Entry<Integer, Floor>> iterator = new ArrayList<>(floors.entrySet()).listIterator(floors.size());
-        while (iterator.hasPrevious()) {
-            Map.Entry<Integer, Floor> entry = iterator.previous();
-            Integer key = entry.getKey();
-            Floor value = entry.getValue();
-            List<Flat> flats = value.getFlats();
-            paint.setColor(Color.BLACK);
-            canvas.drawText(String.valueOf(key), (float) startBorder - 25, (float) top + ((float) flatBlock / 2), paint);
-            for (int j = flats.size() - 1; j >= 0; j--) {
-                drawFlat(canvas, paint, left, top, right, bottom, flatViews, key, flats, j);
-                left += x_inc;
-                right += x_inc;
-
-            }
-            top += y_inc;
-            bottom += y_inc;
-            left = startBorder;
-            right = left + flatBlock;
-        }
-        return flatViews;
+    @NonNull
+    private static GridViewItem getPreFlatItem(Integer floorNum, Floor floor) {
+        GridViewItem preItem = new GridViewItem();
+        preItem.setType(GridItemType.floorNum);
+        Flat fl = new Flat();
+        Planing planing = new Planing();
+        planing.setSrcLayout(floor.getPlan());
+        fl.setPlaning(planing);
+        preItem.setFlat(fl);
+        preItem.setFloorNum(floorNum);
+        return preItem;
     }
 
+    /**
+     * Нужная квартира на этаже
+     * @param flats
+     * @param pos
+     * @return
+     */
     public static Flat getStagedFlat(List<Flat> flats, int pos) {
         for (Flat flat : flats) {
             if ((pos + 1) == flat.getStageNumber1()) {
@@ -250,57 +127,10 @@ public class Local {
         return flats.get(pos);
     }
 
-    private static void drawFlat(Canvas canvas, Paint paint, int left, int top, int right, int bottom, ArrayList<FlatView> flatViews, int i, List<Flat> flats, int j) {
-        Flat flat = getStagedFlat(flats, j);
-        FlatView e = new FlatView(left, top, right, bottom, i - 1, j);
-        e.setFlat(flat);
-        paint.setColor(Color.GRAY);
-        flatViews.add(e);
-        Status status = flat.getStatus();
-        if (status != null && status.getUrl() != null) {
-            switch (status.getUrl()) {
-                case "unavailable":
-                    paint.setColor(Color.GRAY);
-                    canvas.drawLine(left, top, right, top, paint);
-                    canvas.drawLine(right, top, right, bottom, paint);
-                    canvas.drawLine(right, bottom, left, bottom, paint);
-                    canvas.drawLine(left, bottom, left, top, paint);
-                    break;
-                case "free":
-                    if (flat.getDiscount().equals("false")) {
-                        paint.setColor(Color.GREEN);
-                        canvas.drawRect(left, top, right, bottom, paint);
-                        paint.setColor(Color.BLACK);
-                        canvas.drawText(flat.getRoomQuantity(), (float) e.centerX() - 10, (float) e.centerY() + 10, paint);
-                    } else {
-                        paint.setColor(Color.RED);
-                        canvas.drawRect(left, top, right, bottom, paint);
-                        paint.setColor(Color.WHITE);
-                        canvas.drawText(flat.getRoomQuantity(), (float) e.centerX() - 10, (float) e.centerY() + 10, paint);
-                    }
-                    break;
-                case "reserve":
-                    paint.setColor(Color.parseColor("#ffe0af"));
-                    canvas.drawRect(left, top, right, bottom, paint);
-                    paint.setColor(Color.BLACK);
-                    canvas.drawText(flat.getRoomQuantity(), (float) e.centerX() - 10, (float) e.centerY() + 10, paint);
-                    break;
-                case "sold":
-                    paint.setColor(Color.GRAY);
-                    canvas.drawLine(left, top, right, top, paint);
-                    canvas.drawLine(right, top, right, bottom, paint);
-                    canvas.drawLine(right, bottom, left, bottom, paint);
-                    canvas.drawLine(left, bottom, left, top, paint);
-                    canvas.drawText(flat.getRoomQuantity(), (float) e.centerX() - 10, (float) e.centerY() + 10, paint);
-                    break;
-            }
-        }
-    }
-
     @NonNull
     public static ArrayList<KorpusSection> filterEmptySections(List<KorpusSection> korpusSections) {
         ArrayList<KorpusSection> newMap = new ArrayList<>();
-        boolean sold, unavalable, free, reserve,hasFlats;
+        boolean sold, unavalable, free, reserve, hasFlats;
         for (KorpusSection korpusSection : korpusSections) {
             hasFlats = false;
             if (korpusSection.getFloors().size() > 0) {

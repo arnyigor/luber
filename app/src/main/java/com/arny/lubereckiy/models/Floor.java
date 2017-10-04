@@ -7,6 +7,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Floor {
 
+    private int num;
     @SerializedName("plan")
     @Expose
     private String plan;
@@ -44,5 +45,13 @@ public class Floor {
     @Override
     public String toString() {
         return Utility.getColumns(this);
+    }
+
+    public int getNum() {
+        return num;
+    }
+
+    public void setNum(int num) {
+        this.num = num;
     }
 }

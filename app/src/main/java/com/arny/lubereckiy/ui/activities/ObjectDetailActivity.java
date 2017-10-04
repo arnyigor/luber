@@ -12,14 +12,13 @@ import com.arny.arnylib.adapters.SimpleBindableAdapter;
 import com.arny.arnylib.utils.ToastMaker;
 import com.arny.lubereckiy.R;
 import com.arny.lubereckiy.adapter.KorpusesViewHolder;
+import com.arny.lubereckiy.api.API;
 import com.arny.lubereckiy.common.Local;
-import com.arny.lubereckiy.models.Data;
 import com.arny.lubereckiy.models.GenPlan;
 import com.arny.lubereckiy.models.Korpus;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
@@ -50,7 +49,7 @@ public class ObjectDetailActivity extends AppCompatActivity implements SwipeRefr
 
     private void loadObject() {
         if (url != null) {
-            Local.loadGenplan(url)
+            API.loadGenplan(url)
                     .flatMap((Function<List<GenPlan>, ObservableSource<List<Korpus>>>) genPlans -> Observable.create(e -> {
                         e.onNext(genPlans.get(0).getData().getKorpuses());
                         e.onComplete();

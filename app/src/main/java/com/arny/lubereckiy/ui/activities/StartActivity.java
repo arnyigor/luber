@@ -15,13 +15,12 @@ import com.arny.arnylib.utils.Utility;
 import com.arny.lubereckiy.R;
 import com.arny.lubereckiy.adapter.ObjectAdapter;
 import com.arny.lubereckiy.adapter.ObjectViewHolder;
+import com.arny.lubereckiy.api.API;
 import com.arny.lubereckiy.common.Local;
 import com.arny.lubereckiy.models.Pikobject;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class StartActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -41,7 +40,7 @@ public class StartActivity extends AppCompatActivity implements SwipeRefreshLayo
     }
 
     private void loadPlans() {
-        Local.loadPikObjects()
+        API.loadPikObjects()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> mSwipeRefreshLayout.setRefreshing(true))

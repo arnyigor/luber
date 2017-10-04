@@ -18,18 +18,24 @@
             android:id="@+id/spin_section"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-    <TableLayout
-            android:visibility="gone"
-            android:id="@+id/tableLayout"
+    <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-    </TableLayout>
-    <GridView
-            android:visibility="visible"
-            android:id="@+id/gridSection"
             android:background="@drawable/flat_bg"
-            android:layout_margin="5dp"
-            android:padding="5dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content">
+        <ListView
+                android:id="@+id/lv_floors"
+                android:visibility="gone"
+                android:padding="5dp"
+                android:layout_width="45dp"
+                android:layout_height="wrap_content"/>
+        <GridView
+                android:visibility="visible"
+                android:id="@+id/gridSection"
+                android:background="@drawable/flat_bg"
+                android:padding="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/lv_floors"
+                android:layout_toEndOf="@+id/lv_floors"/>
+    </RelativeLayout>
 </LinearLayout>
