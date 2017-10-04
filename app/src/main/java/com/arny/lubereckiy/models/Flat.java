@@ -1,7 +1,7 @@
 
 package com.arny.lubereckiy.models;
 
-import com.arny.arnylib.database.DBProvider;
+import com.arny.arnylib.utils.Utility;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -148,7 +148,7 @@ public class Flat {
 
     @Override
     public String toString() {
-        return DBProvider.getColumns(this);
+        return Utility.getColumns(this);
     }
 
     public String getDiscount() {

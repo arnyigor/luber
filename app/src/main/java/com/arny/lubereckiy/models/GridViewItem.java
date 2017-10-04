@@ -1,5 +1,6 @@
 package com.arny.lubereckiy.models;
 
+import com.arny.arnylib.utils.Utility;
 import com.arny.lubereckiy.common.Local;
 public class GridViewItem {
     private Flat flat;
@@ -28,5 +29,10 @@ public class GridViewItem {
 
     public void setFloorNum(int floorNum) {
         this.floorNum = floorNum;
+    }
+
+    @Override
+    public String toString() {
+        return Utility.getColumns(this);
     }
 }

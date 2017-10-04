@@ -115,34 +115,38 @@ public class Local {
         }
     }
 
-    public static void setCell(int position, TextView textView, Flat flat, Context context, String url) {
-        switch (url) {
-            case "unavailable":
-                System.out.println(position + " unavailable");
+    public static void setCell(Context context, int position, TextView textView, GridViewItem item) {
+        if (item != null && item.getFlat() != null) {
+            String url = item.getFlat().getStatus().getUrl();
+            Flat flat = item.getFlat();
+            switch (url) {
+                case "unavailable":
+                    System.out.println(position + " unavailable");
 //                rowView.setOnClickListener(null);
 //                rowView.setClickable(false);
-                break;
-            case "free":
-                if (flat.getDiscount().equals("false")) {
+                    break;
+                case "free":
+                    if (flat.getDiscount().equals("false")) {
+                        textView.setTextColor(Color.BLACK);
+                        textView.setBackgroundColor(Color.GREEN);
+                        textView.setText(flat.getRoomQuantity());
+                    } else {
+                        textView.setTextColor(Color.WHITE);
+                        textView.setBackgroundColor(Color.RED);
+                        textView.setText(flat.getRoomQuantity());
+                    }
+                    break;
+                case "reserve":
                     textView.setTextColor(Color.BLACK);
-                    textView.setBackgroundColor(Color.GREEN);
+                    textView.setBackgroundColor(Color.parseColor("#ffe0af"));
                     textView.setText(flat.getRoomQuantity());
-                } else {
-                    textView.setTextColor(Color.WHITE);
-                    textView.setBackgroundColor(Color.RED);
+                    break;
+                case "sold":
+                    textView.setTextColor(Color.GRAY);
                     textView.setText(flat.getRoomQuantity());
-                }
-                break;
-            case "reserve":
-                textView.setTextColor(Color.BLACK);
-                textView.setBackgroundColor(Color.parseColor("#ffe0af"));
-                textView.setText(flat.getRoomQuantity());
-                break;
-            case "sold":
-                textView.setTextColor(Color.GRAY);
-                textView.setText(flat.getRoomQuantity());
-                textView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.flat_bg));
-                break;
+                    textView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.flat_bg));
+                    break;
+            }
         }
     }
 
@@ -177,36 +181,6 @@ public class Local {
         return flatViews;
     }
 
-    public static ArrayList<GridViewItem> getSectionFlatsArray(KorpusSection section, TableLayout tableLayout, Context context) {
-        LinkedHashMap<Integer, Floor> floors = section.getFloors();
-        ArrayList<GridViewItem> flatViews = new ArrayList<>();
-        ListIterator<Map.Entry<Integer, Floor>> iterator = new ArrayList<>(floors.entrySet()).listIterator(floors.size());
-        int fls = 0;
-        while (iterator.hasPrevious()) {
-            Map.Entry<Integer, Floor> floorEntry = iterator.previous();
-            Integer floorNum = floorEntry.getKey();
-            fls = floorNum;
-            Floor floor = floorEntry.getValue();
-            List<Flat> flats = floor.getFlats();
-            TableRow tableRow = new TableRow(context);
-            tableRow.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            for (int j = flats.size() - 1; j >= 0; j--) {
-                LayoutInflater systemService = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View view = systemService.inflate(R.layout.flat_item,null);
-                Flat flat = getStagedFlat(flats, j);
-                GridViewItem item = new GridViewItem();
-                item.setType(GridItemType.flat);
-                item.setFlat(flat);
-                item.setFloorNum(floorNum);
-                flatViews.add(item);
-                TextView textViewTitle = (TextView) view.findViewById(R.id.info);
-                setCell(j,textViewTitle, flat,context,flat.getStatus().getUrl());
-                tableRow.addView(view, j);
-            }
-            tableLayout.addView(tableRow, fls);
-        }
-        return flatViews;
-    }
 
     /**
      * Рисуем квартиры

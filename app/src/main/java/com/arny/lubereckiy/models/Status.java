@@ -1,6 +1,7 @@
 
 package com.arny.lubereckiy.models;
 
+import com.arny.arnylib.utils.Utility;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -29,4 +30,8 @@ public class Status {
         this.title = title;
     }
 
+    @Override
+    public String toString() {
+        return Utility.getColumns(this);
+    }
 }

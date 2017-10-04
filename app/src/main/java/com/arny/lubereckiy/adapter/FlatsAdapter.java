@@ -1,26 +1,23 @@
 package com.arny.lubereckiy.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 import com.arny.lubereckiy.R;
-import com.arny.lubereckiy.common.Local;
 import com.arny.lubereckiy.models.Flat;
 import com.arny.lubereckiy.models.GridViewItem;
 
 import java.util.ArrayList;
 public class FlatsAdapter extends BaseAdapter {
-
     private Context mContext;
-    private LayoutInflater inflater;
     private ArrayList<GridViewItem> flats;
 
-    public FlatsAdapter(Context c, ArrayList<GridViewItem> items) {
-        mContext = c;
+    public FlatsAdapter(Context context, ArrayList<GridViewItem> items) {
+        mContext = context;
         flats = items;
     }
 
@@ -40,32 +37,45 @@ public class FlatsAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup viewGroup) {
-        NewHolder holder = null;
-        if (convertView == null) {//if convert view is null then only inflate the row
-            inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.flat_item, viewGroup, false);
-            holder = new NewHolder();
-            //find views in item row
-            holder.textView = (TextView) convertView.findViewById(R.id.tv_info);
-            convertView.setTag(holder);
-        } else { //otherwise get holder from tag
-            holder = (NewHolder) convertView.getTag();
+    public View getView(int position, View convertView, ViewGroup parent) {
+        // inflate the layout for each list row
+        if (convertView == null) {
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.flat_item, parent, false);
         }
-        GridViewItem gridViewItem = flats.get(position);
-        if (gridViewItem != null && gridViewItem.getFlat()!=null) {
-            Flat flat = gridViewItem.getFlat();
-            TextView textView = holder.textView;
-            if (textView != null) {
-                Local.setCell(position, textView, flat, mContext, flat.getStatus().getUrl());
+        TextView textView = (TextView) convertView.findViewById(R.id.info);
+        GridViewItem item = getItem(position);
+        System.out.println("item:" + item);
+        System.out.println("tv:" + textView);
+        if ( textView != null) {
+            if (item != null && item.getFlat() != null) {
+                System.out.println("flat:" +item.getFlat());
+                if (getItem(position).getFlat().getStatus().getUrl().equalsIgnoreCase("unavailable")) {
+                    System.out.println(position + " unavailable");
+                } else if (getItem(position).getFlat().getStatus().getUrl().equalsIgnoreCase("free")) {
+                    System.out.println(position + " free");
+                    if (getItem(position).getFlat().getDiscount().equals("false")) {
+                        textView.setTextColor(Color.BLACK);
+                        textView.setBackgroundColor(Color.GREEN);
+                        textView.setText(getItem(position).getFlat().getRoomQuantity());
+                    } else {
+                        textView.setTextColor(Color.WHITE);
+                        textView.setBackgroundColor(Color.RED);
+                        textView.setText(getItem(position).getFlat().getRoomQuantity());
+                    }
+                } else if (getItem(position).getFlat().getStatus().getUrl().equalsIgnoreCase("reserve")) {
+                    System.out.println(position + " reserve");
+                    textView.setTextColor(Color.BLACK);
+                    textView.setBackgroundColor(Color.parseColor("#ffe0af"));
+                    textView.setText(getItem(position).getFlat().getRoomQuantity());
+                }else if (getItem(position).getFlat().getStatus().getUrl().equalsIgnoreCase("sold")){
+                    System.out.println(position + " sold");
+                    textView.setTextColor(Color.GRAY);
+                    textView.setText(getItem(position).getFlat().getRoomQuantity());
+                    textView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.flat_bg));
+                }
             }
         }
-
         return convertView;
-    }
-
-    public static class NewHolder {
-        TextView textView;
     }
 
 }
