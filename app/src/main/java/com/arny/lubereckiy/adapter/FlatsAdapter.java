@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 import com.arny.arnylib.adapters.OGArrayAdapter;
 import com.arny.arnylib.utils.Stopwatch;
@@ -15,20 +14,15 @@ import com.arny.lubereckiy.models.GridViewItem;
 
 public class FlatsAdapter extends OGArrayAdapter<GridViewItem> {
 
-    private final Stopwatch stopwatch;
-
     public FlatsAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
-       stopwatch = new Stopwatch();
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        stopwatch.start();
         convertView = LayoutInflater.from(getContext()).inflate(R.layout.flat_item, parent, false);
         TextView text = (TextView) convertView.findViewById(R.id.info);
         drawText(position, text);
-        stopwatch.stop();
         return convertView;
     }
 

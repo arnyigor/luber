@@ -16,6 +16,7 @@ import com.arny.lubereckiy.common.Local;
 import com.arny.lubereckiy.models.Flat;
 import com.arny.lubereckiy.models.GridViewItem;
 import com.arny.lubereckiy.models.KorpusSection;
+import com.arny.lubereckiy.models.Status;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -111,28 +112,34 @@ public class KorpusViewActivity extends AppCompatActivity implements AdapterView
         adapter.addAll( Local.getSectionFlatsArray(sections.get(0)));
         gridView.setAdapter(adapter);
         gridView.setNumColumns( sections.get(0).getMaxFlatsOnFloor()+1);
+	    progressDraw.setVisibility(View.GONE);
+	    spinSection.setVisibility(View.VISIBLE);
         gridView.setOnItemClickListener((parent, view, position, id) -> {
             GridViewItem item = adapter.getItem(position);
             if (item != null && item.getFlat() != null) {
                 Flat flat = item.getFlat();
-                String url = flat.getStatus().getUrl();
-                if (url.equals("sold")) {
-                    ToastMaker.toastError(KorpusViewActivity.this, "Продана");
-                    return;
-                }
-                if (!url.equals("unavailable")) {
-                    new FlatDialog(this, flat, item.getFloorNum()).show();
-                } else {
-                    ToastMaker.toastError(KorpusViewActivity.this, "Нет данных");
-                }
+	            Status status = flat.getStatus();
+	            if (status != null) {
+		            String url = status.getUrl();
+		            if (url.equals("sold")) {
+			            ToastMaker.toastError(KorpusViewActivity.this, "Продана");
+			            return;
+		            }
+		            if (!url.equals("unavailable")) {
+			            new FlatDialog(this, flat, item.getFloorNum()).show();
+		            } else {
+			            ToastMaker.toastError(KorpusViewActivity.this, "Нет данных");
+		            }
+	            }else{
+		            if (item.getType().equals(Local.GridItemType.floorNum)) {
+			            ToastMaker.toastSuccess(this, String.valueOf(item.getFloorNum()) + " этаж");
+			            return;
+		            }
+		            ToastMaker.toastError(KorpusViewActivity.this, "Нет данных");
+	            }
             }
         });
-//        lvFloorsAdapter = new LVFloorsAdapter( this, R.layout.floor_item);
-//        lvFloorsAdapter.clear();
-//        lvFloorsAdapter.addAll(Local.getSectionFloorsArray(sections.get(0)));
-//        lvFloors.setAdapter(lvFloorsAdapter);
-        progressDraw.setVisibility(View.GONE);
-        spinSection.setVisibility(View.VISIBLE);
+
     }
 
 }
