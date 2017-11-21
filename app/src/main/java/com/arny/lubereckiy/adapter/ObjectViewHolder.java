@@ -29,10 +29,10 @@ public class ObjectViewHolder extends BindableViewHolder<Pikobject> implements V
 		super.bindView(context, position, item, actionListener);
 		this.position = position;
 		simpleActionListener = (SimpleActionListener) actionListener;
-		TextView tvTitle = (TextView) itemView.findViewById(R.id.tv_title);
+		TextView tvTitle = itemView.findViewById(R.id.tv_title);
 		String name = item.getName();
 		tvTitle.setText(name);
-		TextView tvInfo = (TextView) itemView.findViewById(R.id.tv_info);
+		TextView tvInfo = itemView.findViewById(R.id.tv_info);
 		Integer nearSettlementDate = item.getNearSettlementDate() == null ? -1 : item.getNearSettlementDate();
 		long ts = (long) nearSettlementDate * 1000;
 		String dateTime = nearSettlementDate == -1 ? "-" : DateTimeUtils.getDateTime(ts, "dd MMM yyyy");
@@ -45,7 +45,7 @@ public class ObjectViewHolder extends BindableViewHolder<Pikobject> implements V
 		int reserve = item.getFlatsReserved();
 		double price = MathUtils.round((double) minPrice / 1000000, 3);
 		tvInfo.setText(String.format("%s\nОт:%s млн.%s \n[Все:%d/свободно:%d/резерв:%d]", item.getLocation(), String.valueOf(price), status, all, free, reserve));
-		ImageView imObjPreview = (ImageView) itemView.findViewById(R.id.iv_object_preview);
+		ImageView imObjPreview = itemView.findViewById(R.id.iv_object_preview);
         Img img = item.getImg();
         if (img != null) {
             String imageMap = img.getMain();

@@ -21,7 +21,7 @@ public class FlatsAdapter extends OGArrayAdapter<GridViewItem> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         convertView = LayoutInflater.from(getContext()).inflate(R.layout.flat_item, parent, false);
-        TextView text = (TextView) convertView.findViewById(R.id.info);
+        TextView text = convertView.findViewById(R.id.info);
         drawText(position, text);
         return convertView;
     }

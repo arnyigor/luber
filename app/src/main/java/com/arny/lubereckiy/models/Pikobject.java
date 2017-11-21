@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class Pikobject implements Serializable{
 	@Override
 	public String toString() {
-		return Utility.getColumns(this);
+		return Utility.getFields(this);
 	}
 
 	@SerializedName("id")

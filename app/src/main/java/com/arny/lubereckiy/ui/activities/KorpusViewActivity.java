@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.*;
 import com.arny.arnylib.adapters.OGArrayAdapter;
 import com.arny.arnylib.utils.ToastMaker;
+import com.arny.arnylib.utils.Utility;
 import com.arny.lubereckiy.R;
 import com.arny.lubereckiy.adapter.FlatDialog;
 import com.arny.lubereckiy.adapter.FlatsAdapter;
@@ -17,8 +18,6 @@ import com.arny.lubereckiy.models.Flat;
 import com.arny.lubereckiy.models.GridViewItem;
 import com.arny.lubereckiy.models.KorpusSection;
 import com.arny.lubereckiy.models.Status;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 import java.util.List;
 
@@ -76,19 +75,17 @@ public class KorpusViewActivity extends AppCompatActivity implements AdapterView
     }
 
     private void initUI() {
-        progressDraw = (ProgressBar) findViewById(R.id.progress_draw);
-        gridView = (GridView) findViewById(R.id.gridSection);
-        lvFloors = (ListView) findViewById(R.id.lv_floors);
-        spinSection = (Spinner) findViewById(R.id.spin_section);
+        progressDraw = findViewById(R.id.progress_draw);
+        gridView = findViewById(R.id.gridSection);
+        lvFloors = findViewById(R.id.lv_floors);
+        spinSection = findViewById(R.id.spin_section);
         spinSectionsAdapter = new SectionAdapter(this, R.layout.section_spinner_item);
         spinSection.setAdapter(spinSectionsAdapter);
         spinSection.setOnItemSelectedListener(this);
     }
 
     private void fillUI(String url, String id) {
-        API.getListkorpuses(url, id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        Utility.mainThreadObservable(API.getListkorpuses(url, id))
                 .doOnSubscribe(disposable -> {
                     progressDraw.setVisibility(View.VISIBLE);
                     spinSection.setVisibility(View.GONE);
@@ -126,13 +123,13 @@ public class KorpusViewActivity extends AppCompatActivity implements AdapterView
 			            return;
 		            }
 		            if (!url.equals("unavailable")) {
-			            new FlatDialog(this, flat, item.getFloorNum()).show();
+			            new FlatDialog(this, item).show();
 		            } else {
 			            ToastMaker.toastError(KorpusViewActivity.this, "Нет данных");
 		            }
 	            }else{
 		            if (item.getType().equals(Local.GridItemType.floorNum)) {
-			            ToastMaker.toastSuccess(this, String.valueOf(item.getFloorNum()) + " этаж");
+                        new FlatDialog(this, item).show();
 			            return;
 		            }
 		            ToastMaker.toastError(KorpusViewActivity.this, "Нет данных");

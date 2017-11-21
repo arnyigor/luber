@@ -59,10 +59,10 @@ public class StartActivity extends AppCompatActivity implements SwipeRefreshLayo
     }
 
     private void initUI() {
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.srl_all_list);
+        mSwipeRefreshLayout = findViewById(R.id.srl_all_list);
         mSwipeRefreshLayout.setOnRefreshListener(this);
-        recyclerView = (RecyclerView) findViewById(R.id.rv_all_objects);
-        tvNoItems = (TextView) findViewById(R.id.tv_noitems);
+        recyclerView = findViewById(R.id.rv_all_objects);
+        tvNoItems = findViewById(R.id.tv_noitems);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1, OrientationHelper.VERTICAL, false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         initListAdapter();

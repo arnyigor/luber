@@ -148,7 +148,7 @@ public class Flat {
 
     @Override
     public String toString() {
-        return Utility.getColumns(this);
+        return Utility.getFields(this);
     }
 
     public String getDiscount() {

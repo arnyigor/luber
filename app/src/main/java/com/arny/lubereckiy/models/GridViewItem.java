@@ -33,6 +33,6 @@ public class GridViewItem {
 
     @Override
     public String toString() {
-        return Utility.getColumns(this);
+        return Utility.getFields(this);
     }
 }

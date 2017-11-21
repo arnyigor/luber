@@ -79,9 +79,9 @@ public class ObjectDetailActivity extends AppCompatActivity implements SwipeRefr
     }
 
     private void initUI() {
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.srl_genplan_list);
+        mSwipeRefreshLayout = findViewById(R.id.srl_genplan_list);
         mSwipeRefreshLayout.setOnRefreshListener(this);
-        recyclerView = (RecyclerView) findViewById(R.id.rv_object_genplans);
+        recyclerView = findViewById(R.id.rv_object_genplans);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1, OrientationHelper.VERTICAL, false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         adapter = new SimpleBindableAdapter<>(this, R.layout.genplan_item, KorpusesViewHolder.class);

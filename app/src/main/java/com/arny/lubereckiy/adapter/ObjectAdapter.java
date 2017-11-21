@@ -20,7 +20,7 @@ public class ObjectAdapter extends FilterBindableAdapter<Pikobject, ObjectViewHo
     }
 
     @Override
-    protected void onBindItemViewHolder(ObjectViewHolder viewHolder, final int position, int type) {
+    protected void onBindItemViewHolder(ObjectViewHolder viewHolder, final int position, int type,boolean issel) {
         viewHolder.bindView(context, position, getItem(position), simpleActionListener);
     }
 

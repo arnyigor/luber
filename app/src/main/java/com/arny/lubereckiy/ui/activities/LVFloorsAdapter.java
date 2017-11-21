@@ -35,7 +35,7 @@ class LVFloorsAdapter extends OGArrayAdapter<Floor> {
             LayoutInflater inflater = ((Activity) getContext()).getLayoutInflater();
             rowView = inflater.inflate(R.layout.floor_item, null, true);
             holder = new ViewHolder();
-            holder.textView = (TextView) rowView.findViewById(R.id.tv_floor);
+            holder.textView = rowView.findViewById(R.id.tv_floor);
             rowView.setTag(holder);
         } else {
             holder = (ViewHolder) rowView.getTag();

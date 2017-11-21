@@ -11,7 +11,7 @@ public class KorpusSection {
 
     @Override
     public String toString() {
-        return Utility.getColumns(this);
+        return Utility.getFields(this);
     }
 
     @SerializedName("name")
