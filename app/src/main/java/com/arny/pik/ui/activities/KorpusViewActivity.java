@@ -30,6 +30,7 @@ public class KorpusViewActivity extends AppCompatActivity implements AdapterView
     private String objectTitle;
     private GridView gridView;
     private FlatsAdapter adapter;
+    private TextView tvInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +52,8 @@ public class KorpusViewActivity extends AppCompatActivity implements AdapterView
         adapter.clear();
         adapter.addAll( Local.getSectionFlatsArray(sections.get(position)));
         gridView.setNumColumns( sections.get(position).getMaxFlatsOnFloor()+1);
-        setTitle(objectTitle + "\n" + korpus + "\n" + sections.get(position).getName());
+        setTitle(objectTitle);
+        tvInfo.setText(String.format("%s %s", korpus, sections.get(position).getName()));
     }
 
     @Override
@@ -71,6 +73,7 @@ public class KorpusViewActivity extends AppCompatActivity implements AdapterView
     }
 
     private void initUI() {
+        tvInfo = findViewById(R.id.tvInfo);
         progressDraw = findViewById(R.id.progress_draw);
         gridView = findViewById(R.id.gridSection);
         spinSection = findViewById(R.id.spin_section);
@@ -83,6 +86,7 @@ public class KorpusViewActivity extends AppCompatActivity implements AdapterView
         Utility.mainThreadObservable(API.getListkorpuses(url, id))
                 .doOnSubscribe(disposable -> {
                     gridView.setVisibility(View.GONE);
+                    tvInfo.setVisibility(View.GONE);
                     progressDraw.setVisibility(View.VISIBLE);
                     spinSection.setVisibility(View.GONE);
                 })
@@ -91,6 +95,7 @@ public class KorpusViewActivity extends AppCompatActivity implements AdapterView
                         throwable -> {
                             progressDraw.setVisibility(View.GONE);
                             spinSection.setVisibility(View.GONE);
+                            tvInfo.setVisibility(View.GONE);
                             throwable.printStackTrace();
                             ToastMaker.toastError(this, "Ошибка:" + throwable.getMessage());
                         });
@@ -98,8 +103,10 @@ public class KorpusViewActivity extends AppCompatActivity implements AdapterView
 
     private void setUIByData(List<KorpusSection> korpusSections) {
         gridView.setVisibility(View.VISIBLE);
+        tvInfo.setVisibility(View.VISIBLE);
         this.sections = korpusSections;
-        setTitle(objectTitle + " " + korpus + " " + sections.get(0).getName());
+        setTitle(objectTitle);
+        tvInfo.setText(String.format("%s %s", korpus, sections.get(0).getName()));
         spinSectionsAdapter.addAll(sections);
         adapter = new FlatsAdapter(this,R.layout.flat_item);
         adapter.clear();

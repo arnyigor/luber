@@ -1,7 +1,6 @@
 package com.arny.pik.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +15,6 @@ import com.arny.pik.models.Flat;
 import com.arny.pik.models.GridViewItem;
 import com.arny.pik.models.Planing;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
 public class FlatDialog extends ADBuilder {
     private final Flat flat;
     private final GridViewItem item;
@@ -44,23 +41,13 @@ public class FlatDialog extends ADBuilder {
 		tvFlatArea = view.findViewById(R.id.tv_flat_area);
         view.findViewById(R.id.btn_flat_ok).setOnClickListener(v -> getDialog().dismiss());
         imgFlatView.setOnClickListener(view1 -> {
+            Log.i(FlatDialog.class.getSimpleName(), "initUI: flat:" + flat);
             Planing planing = flat.getPlaning();
-            Log.i(FlatDialog.class.getSimpleName(), "initUI: planing:" + planing);
-            String srcLayout = planing.getSrcLayout();
-            if (srcLayout == null) {
+            if (planing != null && planing.getSrcLayout() != null) {
+                Local.viewTouchImage(planing.getSrcLayout(), context);
+            } else {
                 ToastMaker.toastError(context,"Изображение не найдено");
-                return;
             }
-
-            Glide.with(context.getApplicationContext())
-                    .asBitmap()
-                    .load(srcLayout)
-                    .into(new SimpleTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                            Local.viewTouchImage(resource, context);
-                        }
-                    });
         });
 	}
 

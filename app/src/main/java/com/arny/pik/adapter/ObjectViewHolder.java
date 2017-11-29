@@ -2,6 +2,7 @@ package com.arny.pik.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,7 +26,8 @@ public class ObjectViewHolder extends BindableViewHolder<Pikobject> implements V
 	@Override
 	public void bindView(Context context, int position, Pikobject item, ActionListener actionListener) {
 		super.bindView(context, position, item, actionListener);
-		this.position = position;
+        Log.i(ObjectViewHolder.class.getSimpleName(), "bindView: item:" + item);
+        this.position = position;
 		simpleActionListener = (SimpleActionListener) actionListener;
 		TextView tvTitle = itemView.findViewById(R.id.tv_title);
 		String name = item.getName();
@@ -35,14 +37,12 @@ public class ObjectViewHolder extends BindableViewHolder<Pikobject> implements V
 		long ts = (long) nearSettlementDate * 1000;
 		String dateTime = nearSettlementDate == -1 ? "-" : DateTimeUtils.getDateTime(ts, "dd MMM yyyy");
 		String s = "заселение:" + dateTime;
-		String status = item.getSticker() == null ? s :
-				"\n" + item.getSticker().getText() + "\n" + s;
 		int minPrice = item.getMinPrice();
 		int all = item.getFlatsAll();
 		int free = item.getFlatsFree();
 		int reserve = item.getFlatsReserved();
 		double price = MathUtils.round((double) minPrice / 1000000, 3);
-		tvInfo.setText(String.format("%s\nОт:%s млн.%s \n[Все:%d/свободно:%d/резерв:%d]", item.getLocation(), String.valueOf(price), status, all, free, reserve));
+		tvInfo.setText(String.format("%s\nОт:%s млн. \n[Все:%d/свободно:%d/резерв:%d]", item.getLocation(), String.valueOf(price),  all, free, reserve));
 		ImageView imObjPreview = itemView.findViewById(R.id.iv_object_preview);
         Img img = item.getImg();
         if (img != null) {

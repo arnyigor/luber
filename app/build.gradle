@@ -4,7 +4,7 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
-        applicationId "com.arny.lubereckiy"
+        applicationId "com.arny.pik"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -38,5 +38,12 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(path: ':arnylib')
+    compile 'com.github.piasy:BigImageViewer:1.4.4'
+    // load with fresco
+    compile 'com.github.piasy:FrescoImageLoader:1.4.4'
+    // load with glide
+    compile 'com.github.piasy:GlideImageLoader:1.4.4'
+    // progress pie indicator
+    compile 'com.github.piasy:ProgressPieIndicator:1.4.4'
     compile 'com.android.support:multidex:1.0.2'
 }

@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +16,7 @@ import com.arny.pik.R;
 import com.arny.pik.models.*;
 import com.arny.pik.ui.activities.KorpusViewActivity;
 import com.arny.pik.ui.activities.ObjectDetailActivity;
+import com.github.piasy.biv.view.BigImageView;
 
 import java.util.*;
 public class Local {
@@ -69,15 +71,12 @@ public class Local {
         }
     }
 
-    public static void viewTouchImage(Bitmap bitmap, Context context) {
-        if (bitmap == null) {
-            ToastMaker.toastError(context,"Bitmap is null");
-            return;
-        }
+    public static void viewTouchImage(String src, Context context) {
         Dialog dialog=new Dialog(context,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         dialog.setContentView(R.layout.dialog_image_view_layout);
-        TouchImageView imageDialog = dialog.findViewById(R.id.imageDialog);
-        imageDialog.setImageBitmap(bitmap);
+        BigImageView bigImageView = dialog.findViewById(R.id.mBigImage);
+        bigImageView.setBackgroundColor(Color.WHITE);
+        bigImageView.showImage(Uri.parse(src));
         dialog.show();
     }
 

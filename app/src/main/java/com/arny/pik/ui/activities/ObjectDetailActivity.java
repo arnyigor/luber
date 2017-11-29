@@ -10,6 +10,7 @@ import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import com.arny.arnylib.adapters.SimpleBindableAdapter;
 import com.arny.arnylib.utils.ToastMaker;
+import com.arny.arnylib.utils.Utility;
 import com.arny.pik.R;
 import com.arny.pik.adapter.KorpusesViewHolder;
 import com.arny.pik.api.API;
@@ -49,12 +50,10 @@ public class ObjectDetailActivity extends AppCompatActivity implements SwipeRefr
 
     private void loadObject() {
         if (url != null) {
-            API.loadGenplan(url)
-                    .flatMap((Function<List<GenPlan>, ObservableSource<List<Korpus>>>) genPlans -> Observable.create(e -> {
+            Utility.mainThreadObservable(API.loadGenplan(url).flatMap((Function<List<GenPlan>, ObservableSource<List<Korpus>>>) genPlans -> Observable.create(e -> {
                         e.onNext(genPlans.get(0).getData().getKorpuses());
                         e.onComplete();
-                    }))
-                    .map(korpuses -> {
+                    })).map(korpuses -> {
                         List<Korpus> list = new ArrayList<>();
                         for (Korpus korpus : korpuses) {
                             if (korpus.getType().equals("flats")) {
@@ -62,9 +61,7 @@ public class ObjectDetailActivity extends AppCompatActivity implements SwipeRefr
                             }
                         }
                         return list;
-                    })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+                    }))
                     .doOnSubscribe(disposable -> mSwipeRefreshLayout.setRefreshing(true))
                     .subscribe(korpuses -> {
                                 objects = korpuses;
@@ -91,22 +88,6 @@ public class ObjectDetailActivity extends AppCompatActivity implements SwipeRefr
         recyclerView.setAdapter(adapter);
     }
 
-    public void showLoadProgress() {
-        mSwipeRefreshLayout.setRefreshing(true);
-    }
-
-    public void hideLoadProgress() {
-        mSwipeRefreshLayout.setRefreshing(false);
-    }
-
-    public void showError(String error) {
-        ToastMaker.toastError(this, error);
-    }
-
-    public void navigateTo(Intent intent) {
-        startActivity(intent);
-    }
-
     @Override
     public void onRefresh() {
         loadObject();
@@ -115,9 +96,5 @@ public class ObjectDetailActivity extends AppCompatActivity implements SwipeRefr
     public void setAdapterData(List<Korpus> data) {
         objects = data;
         Local.setAdapterData(adapter, data, recyclerView, false);
-    }
-
-    public void setFilteredData(List<Korpus> data) {
-
     }
 }
