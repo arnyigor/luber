@@ -6,15 +6,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.arny.arnylib.adapters.OGArrayAdapter;
-import com.arny.pik.R;
-import com.arny.pik.common.Local;
-import com.arny.pik.models.GridViewItem;
 
-public class FlatsAdapter extends OGArrayAdapter<GridViewItem> {
+import com.arny.pik.R;
+import com.arny.pik.data.Local;
+import com.arny.pik.data.models.GridViewItem;
+import com.arny.pik.utils.adapters.AbstractArrayAdapter;
+
+public class FlatsAdapter extends AbstractArrayAdapter<GridViewItem> {
 
     public FlatsAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
+    }
+
+    @Override
+    protected String getItemTitle(GridViewItem item) {
+        return item.getFlat().toString();
     }
 
     @Override

@@ -6,16 +6,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.arny.arnylib.adapters.ADBuilder;
-import com.arny.arnylib.utils.MathUtils;
-import com.arny.arnylib.utils.ToastMaker;
+
 import com.arny.pik.R;
-import com.arny.pik.common.Local;
-import com.arny.pik.models.Flat;
-import com.arny.pik.models.GridViewItem;
-import com.arny.pik.models.Planing;
+import com.arny.pik.data.Local;
+import com.arny.pik.data.models.Flat;
+import com.arny.pik.data.models.GridViewItem;
+import com.arny.pik.data.models.Planing;
+import com.arny.pik.utils.MathUtils;
+import com.arny.pik.utils.ToastMaker;
+import com.arny.pik.utils.adapters.AbstractDialogBuilder;
 import com.bumptech.glide.Glide;
-public class FlatDialog extends ADBuilder {
+
+public class FlatDialog extends AbstractDialogBuilder {
     private final Flat flat;
     private final GridViewItem item;
     private Context context;
@@ -39,7 +41,7 @@ public class FlatDialog extends ADBuilder {
 		tvFloorNum = view.findViewById(R.id.tv_floor_num);
 		tvFlatPrice = view.findViewById(R.id.tv_flat_price);
 		tvFlatArea = view.findViewById(R.id.tv_flat_area);
-        view.findViewById(R.id.btn_flat_ok).setOnClickListener(v -> getDialog().dismiss());
+        view.findViewById(R.id.btn_flat_ok).setOnClickListener(v -> mAlertDialog.dismiss());
         imgFlatView.setOnClickListener(view1 -> {
             Log.i(FlatDialog.class.getSimpleName(), "initUI: flat:" + flat);
             Planing planing = flat.getPlaning();

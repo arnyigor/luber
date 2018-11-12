@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".ui.activities.StartActivity">
+        tools:context=".StartActivity">
     <TextView
             android:id="@+id/tv_noitems"
             android:layout_width="match_parent"

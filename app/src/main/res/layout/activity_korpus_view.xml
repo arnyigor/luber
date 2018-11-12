@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context="com.arny.pik.ui.activities.KorpusViewActivity">
+        tools:context="com.arny.pik.presenter.korpus.KorpusViewActivity">
     <ProgressBar
             android:id="@+id/progress_draw"
             android:layout_gravity="center_horizontal"
